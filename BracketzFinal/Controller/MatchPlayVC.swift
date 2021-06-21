@@ -29,8 +29,14 @@ class MatchPlayVC: UIViewController {
     var loser = String()
     
     
+    
     private let rockButton: UIButton = {
         let button = UIButton()
+        let image = #imageLiteral(resourceName: "Fist2x")
+        let tintedImage = image.withRenderingMode(.alwaysTemplate)
+        button.setImage(tintedImage, for: .normal)
+        button.tintColor = .black
+        button.imageEdgeInsets = UIEdgeInsets(top: 12,left: 20,bottom: 12,right: 20)
         button.layer.borderWidth = 3
         button.layer.borderColor = #colorLiteral(red: 0, green: 0, blue: 0, alpha: 1)
         button.setTitle("rock", for: .normal)
@@ -41,6 +47,11 @@ class MatchPlayVC: UIViewController {
     
     private let paperButton: UIButton = {
         let button = UIButton()
+        let image = #imageLiteral(resourceName: "Paper2x")
+        let tintedImage = image.withRenderingMode(.alwaysTemplate)
+        button.setImage(tintedImage, for: .normal)
+        button.tintColor = .black
+        button.imageEdgeInsets = UIEdgeInsets(top: 12,left: 20,bottom: 12,right: 20)
         button.layer.borderWidth = 3
         button.layer.borderColor = #colorLiteral(red: 0, green: 0, blue: 0, alpha: 1)
         button.setTitle("paper", for: .normal)
@@ -51,6 +62,11 @@ class MatchPlayVC: UIViewController {
     
     private let scissorsButton: UIButton = {
         let button = UIButton()
+        let image = #imageLiteral(resourceName: "Scissors")
+        let tintedImage = image.withRenderingMode(.alwaysTemplate)
+        button.setImage(tintedImage, for: .normal)
+        button.tintColor = .black
+        button.imageEdgeInsets = UIEdgeInsets(top: 12,left: 12,bottom: 12,right: 12)
         button.layer.borderWidth = 3
         button.layer.borderColor = #colorLiteral(red: 0, green: 0, blue: 0, alpha: 1)
         button.setTitle("scissors", for: .normal)
@@ -136,6 +152,7 @@ class MatchPlayVC: UIViewController {
         } else {
             opponentNameLabel.text = "Opponent: \(users[0].username)"
         }
+        
         
         let stack2 = UIStackView(arrangedSubviews: [rockButton, paperButton, scissorsButton])
         stack2.axis = .horizontal

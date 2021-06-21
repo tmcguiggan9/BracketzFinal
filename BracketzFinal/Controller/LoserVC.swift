@@ -11,7 +11,7 @@ class LoserVC: UIViewController {
     
     private let loseLabel: UILabel = {
         let label = UILabel()
-        label.text = "Fucking Loser"
+        label.text = "Loser@"
         label.font = UIFont.boldSystemFont(ofSize: 30)
         label.textAlignment = .center
         return label

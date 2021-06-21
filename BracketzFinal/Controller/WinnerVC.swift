@@ -11,7 +11,7 @@ class WinnerVC: UIViewController {
     
     private let winLabel: UILabel = {
         let label = UILabel()
-        label.text = "Oh FUCK, you won!"
+        label.text = "You won the tournament!"
         label.font = UIFont.boldSystemFont(ofSize: 30)
         label.textAlignment = .center
         return label

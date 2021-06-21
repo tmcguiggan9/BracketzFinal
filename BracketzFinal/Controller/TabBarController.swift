@@ -6,10 +6,20 @@
 //
 
 import UIKit
+import Firebase
 
 class TabBarController: UITabBarController, UITabBarControllerDelegate, SideMenuVCDelegate {
     func handleLogout() {
-        print("123")
+        do {
+            try Auth.auth().signOut()
+            DispatchQueue.main.async {
+                let nav = UINavigationController(rootViewController: LoginController())
+                nav.modalPresentationStyle = .fullScreen
+                self.present(nav, animated: true, completion: nil)
+            }
+        } catch {
+            print("error signing out")
+        }
     }
     
 
@@ -27,6 +37,7 @@ class TabBarController: UITabBarController, UITabBarControllerDelegate, SideMenu
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
+        checkLoggedIn()
         let view1 = TournyTypeVC()
         let view2 = JoinTournyVC()
         let icon1 = UITabBarItem(title: "Create", image: UIImage(systemName: "plus"), selectedImage: UIImage(systemName: "plus"))
@@ -36,6 +47,21 @@ class TabBarController: UITabBarController, UITabBarControllerDelegate, SideMenu
         let controllers = [view1, view2]
         self.viewControllers = controllers
     
+    }
+    
+    func checkLoggedIn() {
+        if Auth.auth().currentUser == nil {
+            presentLoginScreen()
+        }
+    }
+    
+    func presentLoginScreen() {
+        DispatchQueue.main.async {
+            let controller = LoginController()
+            let nav = UINavigationController(rootViewController: controller)
+            nav.modalPresentationStyle = .fullScreen
+            self.present(nav, animated: true, completion: nil)
+        }
     }
     
     @objc func presentMenu() {
