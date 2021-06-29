@@ -20,6 +20,7 @@ class LobbyVC: UIViewController, UICollectionViewDelegate, UICollectionViewDataS
     var tournySize = Int()
     var waitingOn = Int()
     let tournyBuyIn = 1
+    let isPublic = false
     
     
     var matchesArray: [String]? {

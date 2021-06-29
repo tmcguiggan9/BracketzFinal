@@ -97,15 +97,7 @@ class UserSelectionVC: UIViewController, UISearchControllerDelegate, UICollectio
     
     @objc func cancelTournament() {
         navigationController?.popViewController(animated: true)
-//        users?.append(contentsOf: finalTournyUsers)
-//        finalTournyUsers.removeAll()
-//        finalTournyUsers.append(currentUser!)
-//        searchController.searchBar.isUserInteractionEnabled = true
-//        searchController.searchBar.placeholder = "Add users..."
-//        sendInviteButton.isEnabled = false
-//        updateUsers()
-//        tableView.reloadData()
-//
+
     }
     
     
@@ -114,7 +106,7 @@ class UserSelectionVC: UIViewController, UISearchControllerDelegate, UICollectio
         sendInviteButton.isEnabled = false
         sendInviteButton.backgroundColor = .gray
         
-        let values = ["tournamentUsers": tournyUsers, "acceptedUsers": 1] as [String: Any]
+        let values = ["tournamentUsers": tournyUsers, "acceptedUsers": 1, "isPublic": false] as [String: Any]
         REF_TOURNAMENTS.childByAutoId().updateChildValues(values) { (error, ref) in
             self.dismiss(animated: true, completion: nil)
             
@@ -129,7 +121,7 @@ class UserSelectionVC: UIViewController, UISearchControllerDelegate, UICollectio
                 }
             }
             
-                let newTourny = Tournament(ref.key!, tournamentUsers: self.tournyUsers)
+                let newTourny = Tournament(ref.key!, tournamentUsers: self.tournyUsers, false)
                 let controller = LobbyVC()
                 controller.tourny = newTourny
                 controller.tournySize = self.tournySize!

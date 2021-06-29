@@ -61,7 +61,7 @@ class InvitesVC: UITableViewController {
         
         REF_TOURNAMENTS.child(invites![indexPath.row]).child("tournamentUsers").observeSingleEvent(of: .value) { (snapshot) in
             guard let users = snapshot.value as? [String] else { return }
-            controller.tourny = Tournament(self.invites![indexPath.row], tournamentUsers: users)
+            controller.tourny = Tournament(self.invites![indexPath.row], tournamentUsers: users, false)
             controller.tournySize = users.count
         }
         navigationController?.pushViewController(controller, animated: true)

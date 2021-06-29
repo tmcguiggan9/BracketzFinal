@@ -320,7 +320,7 @@ class MatchPlayVC: UIViewController {
                 if users.count == newTournySize {
                     self.shouldPresentLoadingView(false)
                     let controller = LobbyVC()
-                    controller.tourny = Tournament(self.tourny!.tournamentID, tournamentUsers: users)
+                    controller.tourny = Tournament(self.tourny!.tournamentID, tournamentUsers: users, false)
                     controller.tournySize = newTournySize
                     self.navigationController?.popToRootViewController(animated: true)
                     self.navigationController?.pushViewController(controller, animated: true)
