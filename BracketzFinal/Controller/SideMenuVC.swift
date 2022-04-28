@@ -7,7 +7,7 @@
 
 import UIKit
 
-protocol SideMenuVCDelegate: class {
+protocol SideMenuVCDelegate: AnyObject {
     func handleLogout()
 }
 

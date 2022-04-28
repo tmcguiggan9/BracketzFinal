@@ -106,28 +106,7 @@ class UserSelectionVC: UIViewController, UISearchControllerDelegate, UICollectio
         sendInviteButton.isEnabled = false
         sendInviteButton.backgroundColor = .gray
         
-        let values = ["tournamentUsers": tournyUsers, "acceptedUsers": 1, "isPublic": false] as [String: Any]
-        REF_TOURNAMENTS.childByAutoId().updateChildValues(values) { (error, ref) in
-            self.dismiss(animated: true, completion: nil)
-            
-            for x in self.tournyUsers {
-                REF_USERS.child(x).child("unresolvedTournaments").observeSingleEvent(of: .value) { (snapshot) in
-                    if var array = snapshot.value as? [String] {
-                        array.append(ref.key!)
-                        REF_USERS.child(x).updateChildValues(["unresolvedTournaments": array])
-                    } else {
-                        REF_USERS.child(x).updateChildValues(["unresolvedTournaments": [ref.key]])
-                    }
-                }
-            }
-            
-                let newTourny = Tournament(ref.key!, tournamentUsers: self.tournyUsers, false)
-                let controller = LobbyVC()
-                controller.tourny = newTourny
-                controller.tournySize = self.tournySize!
-                
-                self.navigationController?.pushViewController(controller, animated: true)
-            }
+        Service.shared.sendInvitesAndCreateTournament(tournyUsers: tournyUsers, tournySize: tournySize!, view: self)
     }
     
     func fetchAllUsers() {

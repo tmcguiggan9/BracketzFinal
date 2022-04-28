@@ -94,6 +94,7 @@ DEPENDENCIES:
   - Firebase/Database
   - Firebase/Storage
   - GeoFire (>= 1.1)
+  - GoogleUtilities/Environment
 
 SPEC REPOS:
   trunk:
@@ -132,6 +133,6 @@ SPEC CHECKSUMS:
   nanopb: 59317e09cf1f1a0af72f12af412d54edf52603fc
   PromisesObjC: 8c196f5a328c2cba3e74624585467a557dcb482f
 
-PODFILE CHECKSUM: f95b056c821174db2be1d467e267ef12d5c3b1f4
+PODFILE CHECKSUM: a45ae68ed3ad7446fde6f9089622acb7da8d5dd4
 
 COCOAPODS: 1.10.0

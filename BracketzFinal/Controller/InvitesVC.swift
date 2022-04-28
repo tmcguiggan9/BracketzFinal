@@ -10,8 +10,6 @@ import Firebase
 
 class InvitesVC: UITableViewController {
     
-
-    
     private var invites: [String]? {
         didSet {
             tableView.reloadData()
@@ -50,22 +48,9 @@ class InvitesVC: UITableViewController {
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         navigationController?.popViewController(animated: true)
-        let controller = LobbyVC()
-        
-        REF_TOURNAMENTS.child(invites![indexPath.row]).child("acceptedUsers").observeSingleEvent(of: .value) { (snapshot) in
-            guard var presentUsers = snapshot.value as? Int else { return }
-            presentUsers += 1
-            REF_TOURNAMENTS.child(self.invites![indexPath.row]).updateChildValues(["acceptedUsers": presentUsers])
+        if let invites = invites {
+            Service.shared.addUserToInviteList(invites: invites, row: indexPath.row, view: self)
         }
-        
-        
-        REF_TOURNAMENTS.child(invites![indexPath.row]).child("tournamentUsers").observeSingleEvent(of: .value) { (snapshot) in
-            guard let users = snapshot.value as? [String] else { return }
-            controller.tourny = Tournament(self.invites![indexPath.row], tournamentUsers: users, false)
-            controller.tournySize = users.count
-        }
-        navigationController?.pushViewController(controller, animated: true)
-        
     }
     
     override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {

@@ -16,7 +16,7 @@ class JoinTournyVC: UIViewController, UIPickerViewDelegate, UIPickerViewDataSour
     var sizeOptions = [2, 4, 8, 16]
     var buyInOptions = ["$.25"]
     let currentUser = Auth.auth().currentUser?.uid
-    var tournyUsers = [String]()
+    
     
     
     private let tournySizeLabel: UILabel = {
@@ -83,73 +83,8 @@ class JoinTournyVC: UIViewController, UIPickerViewDelegate, UIPickerViewDataSour
     
     
     @objc func checkForTourny() {
-        REF_TOURNAMENTS.observeSingleEvent(of: .value) { (snapshot) in
-            if let tournys = snapshot.value as? [String: Any] {
-                for x in tournys {
-                    var dictionary: [String: Any]
-                    dictionary = x.value as! [String: Any]
-                    if dictionary["isPublic"] as! Int == 1 && dictionary["tournySize"] as! Int == self.tournySize{
-                        print(x.key)
-                        
-                        REF_TOURNAMENTS.child(x.key).runTransactionBlock { (currentData: MutableData) -> TransactionResult in
-                            var tourny = currentData.value as? [String: Any]
-                            
-                            
-                            if tourny == nil {
-                                tourny = [:]
-                            } else {
-                                tourny!["acceptedUsers"] = tourny!["acceptedUsers"] as! Int + 1
-                                self.tournyUsers = (tourny!["tournamentUsers"] as? [String])!
-                                self.tournyUsers.append(self.currentUser!)
-                                tourny!["tournamentUsers"] = self.tournyUsers
-                                
-                                currentData.value = tourny
-                            }
-                            
-                            REF_TOURNAMENTS.child(x.key).child("tournamentUsers").observe(.value) { (snapshot) in
-                                guard let users = snapshot.value as? [String] else { return }
-                                
-                                if users.count == self.tournySize {
-                                    self.shouldPresentLoadingView(false)
-                                    DispatchQueue.main.async {
-                                        let controller = LobbyVC()
-                                        controller.tourny = Tournament(x.key, tournamentUsers: users, true)
-                                        controller.tournySize = self.tournySize
-                                        self.navigationController?.popToRootViewController(animated: true)
-                                        self.navigationController?.pushViewController(controller, animated: true)
-                                    }
-                                }
-                                self.shouldPresentLoadingView(true, message: "Waiting for other users to join...")
-                            }
-                            return TransactionResult.success(withValue: currentData)
-                        }
-                        return
-                    }
-                }
-            }
-            let values = ["tournamentUsers": [self.currentUser], "acceptedUsers": 1, "isPublic": true, "tournySize": self.tournySize] as [String: Any]
-            REF_TOURNAMENTS.childByAutoId().updateChildValues(values) { (error, ref) in
-                
-                REF_TOURNAMENTS.child(ref.key!).child("tournamentUsers").observe(.value) { (snapshot) in
-                    guard let users = snapshot.value as? [String] else { return }
-                    
-                    if users.count == self.tournySize {
-                        REF_TOURNAMENTS.child(ref.key!).updateChildValues(["isPublic": false])
-                        self.shouldPresentLoadingView(false)
-                        DispatchQueue.main.async {
-                            let controller = LobbyVC()
-                            controller.tourny = Tournament(ref.key!, tournamentUsers: users, true)
-                            controller.tournySize = self.tournySize
-                            self.navigationController?.popToRootViewController(animated: true)
-                            self.navigationController?.pushViewController(controller, animated: true)
-                        }
-                        
-                    }
-                    self.shouldPresentLoadingView(true, message: "Waiting for other users to join...")
-                }
-                
-            }
-        }
+        guard let currentUser = currentUser else { return }
+        Service.shared.findPublicTournament(tournySize: tournySize, currentUser: currentUser, view: self)
     }
     
     
@@ -240,9 +175,3 @@ class JoinTournyVC: UIViewController, UIPickerViewDelegate, UIPickerViewDataSour
         }
     }
 }
-
-//extension TournyTypeVC: SideMenuVCDelegate {
-//    func handleLogout() {
-//        signOut()
-//    }
-//}

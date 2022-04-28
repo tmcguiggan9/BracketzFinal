@@ -75,4 +75,119 @@ struct Service {
     
         REF_TOURNAMENTS.child(uid).child("acceptedUsers").removeAllObservers()
     }
+    
+    func findPublicTournament(tournySize: Int, currentUser: String, view: UIViewController) {
+        var tournyUsers = [String]()
+        REF_TOURNAMENTS.observeSingleEvent(of: .value) { (snapshot) in
+            if let tournys = snapshot.value as? [String: Any] {
+                for x in tournys {
+                    var dictionary: [String: Any]
+                    dictionary = x.value as! [String: Any]
+                    if dictionary["isPublic"] as! Int == 1 && dictionary["tournySize"] as! Int == tournySize{
+                        print(x.key)
+                        
+                        REF_TOURNAMENTS.child(x.key).runTransactionBlock { (currentData: MutableData) -> TransactionResult in
+                            var tourny = currentData.value as? [String: Any]
+                            
+                            
+                            if tourny == nil {
+                                tourny = [:]
+                            } else {
+                                tourny!["acceptedUsers"] = tourny!["acceptedUsers"] as! Int + 1
+                                tournyUsers = (tourny!["tournamentUsers"] as? [String])!
+                                tournyUsers.append(currentUser)
+                                tourny!["tournamentUsers"] = tournyUsers
+                                
+                                currentData.value = tourny
+                            }
+                            
+                            REF_TOURNAMENTS.child(x.key).child("tournamentUsers").observe(.value) { (snapshot) in
+                                guard let users = snapshot.value as? [String] else { return }
+                                
+                                if users.count == tournySize {
+                                    view.shouldPresentLoadingView(false)
+                                    DispatchQueue.main.async {
+                                        let controller = LobbyVC()
+                                        controller.tourny = Tournament(x.key, tournamentUsers: users, true)
+                                        controller.tournySize = tournySize
+                                        view.navigationController?.popToRootViewController(animated: true)
+                                        view.navigationController?.pushViewController(controller, animated: true)
+                                    }
+                                }
+                                view.shouldPresentLoadingView(true, message: "Waiting for other users to join...")
+                            }
+                            return TransactionResult.success(withValue: currentData)
+                        }
+                        return
+                    }
+                }
+            }
+            let values = ["tournamentUsers": [currentUser], "acceptedUsers": 1, "isPublic": true, "tournySize": tournySize] as [String: Any]
+            REF_TOURNAMENTS.childByAutoId().updateChildValues(values) { (error, ref) in
+                
+                REF_TOURNAMENTS.child(ref.key!).child("tournamentUsers").observe(.value) { (snapshot) in
+                    guard let users = snapshot.value as? [String] else { return }
+                    
+                    if users.count == tournySize {
+                        REF_TOURNAMENTS.child(ref.key!).updateChildValues(["isPublic": false])
+                        view.shouldPresentLoadingView(false)
+                        DispatchQueue.main.async {
+                            let controller = LobbyVC()
+                            controller.tourny = Tournament(ref.key!, tournamentUsers: users, true)
+                            controller.tournySize = tournySize
+                            view.navigationController?.popToRootViewController(animated: true)
+                            view.navigationController?.pushViewController(controller, animated: true)
+                        }
+                        
+                    }
+                    view.shouldPresentLoadingView(true, message: "Waiting for other users to join...")
+                }
+                
+            }
+        }
+    }
+    
+    
+    func addUserToInviteList(invites: [String], row: Int, view: UIViewController) {
+        let controller = LobbyVC()
+        
+        REF_TOURNAMENTS.child(invites[row]).child("acceptedUsers").observeSingleEvent(of: .value) { (snapshot) in
+            guard var presentUsers = snapshot.value as? Int else { return }
+            presentUsers += 1
+            REF_TOURNAMENTS.child(invites[row]).updateChildValues(["acceptedUsers": presentUsers])
+        }
+        
+        
+        REF_TOURNAMENTS.child(invites[row]).child("tournamentUsers").observeSingleEvent(of: .value) { (snapshot) in
+            guard let users = snapshot.value as? [String] else { return }
+            controller.tourny = Tournament(invites[row], tournamentUsers: users, false)
+            controller.tournySize = users.count
+        }
+        view.navigationController?.pushViewController(controller, animated: true)
+    }
+    
+    func sendInvitesAndCreateTournament(tournyUsers: [String], tournySize: Int, view: UIViewController) {
+        let values = ["tournamentUsers": tournyUsers, "acceptedUsers": 1, "isPublic": false] as [String: Any]
+        REF_TOURNAMENTS.childByAutoId().updateChildValues(values) { (error, ref) in
+            view.dismiss(animated: true, completion: nil)
+            
+            for x in tournyUsers {
+                REF_USERS.child(x).child("unresolvedTournaments").observeSingleEvent(of: .value) { (snapshot) in
+                    if var array = snapshot.value as? [String] {
+                        array.append(ref.key!)
+                        REF_USERS.child(x).updateChildValues(["unresolvedTournaments": array])
+                    } else {
+                        REF_USERS.child(x).updateChildValues(["unresolvedTournaments": [ref.key]])
+                    }
+                }
+            }
+            
+                let newTourny = Tournament(ref.key!, tournamentUsers: tournyUsers, false)
+                let controller = LobbyVC()
+                controller.tourny = newTourny
+                controller.tournySize = tournySize
+                
+                view.navigationController?.pushViewController(controller, animated: true)
+            }
+    }
 }

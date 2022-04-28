@@ -21,7 +21,7 @@
 		BC5ABDF5266E7EA5007C8035 /* PlayerCollectionCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC5ABDF4266E7EA5007C8035 /* PlayerCollectionCell.swift */; };
 		BC5EB4E1263DAD83006B9EE0 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC5EB4E0263DAD83006B9EE0 /* AppDelegate.swift */; };
 		BC5EB4E3263DAD83006B9EE0 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC5EB4E2263DAD83006B9EE0 /* SceneDelegate.swift */; };
-		BC5EB4E5263DAD83006B9EE0 /* TournyTypeVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC5EB4E4263DAD83006B9EE0 /* TournyTypeVC.swift */; };
+		BC5EB4E5263DAD83006B9EE0 /* CreateTournyVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC5EB4E4263DAD83006B9EE0 /* CreateTournyVC.swift */; };
 		BC5EB4E8263DAD83006B9EE0 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = BC5EB4E6263DAD83006B9EE0 /* Main.storyboard */; };
 		BC5EB4EA263DAD84006B9EE0 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = BC5EB4E9263DAD84006B9EE0 /* Assets.xcassets */; };
 		BC5EB4ED263DAD84006B9EE0 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = BC5EB4EB263DAD84006B9EE0 /* LaunchScreen.storyboard */; };
@@ -56,7 +56,7 @@
 		BC5EB4DD263DAD83006B9EE0 /* BracketzFinal.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = BracketzFinal.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		BC5EB4E0263DAD83006B9EE0 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		BC5EB4E2263DAD83006B9EE0 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
-		BC5EB4E4263DAD83006B9EE0 /* TournyTypeVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TournyTypeVC.swift; sourceTree = "<group>"; };
+		BC5EB4E4263DAD83006B9EE0 /* CreateTournyVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateTournyVC.swift; sourceTree = "<group>"; };
 		BC5EB4E7263DAD83006B9EE0 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		BC5EB4E9263DAD84006B9EE0 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		BC5EB4EC263DAD84006B9EE0 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
@@ -151,7 +151,7 @@
 			isa = PBXGroup;
 			children = (
 				BC4CE9EF264ED1A200298C29 /* Authentication  */,
-				BC5EB4E4263DAD83006B9EE0 /* TournyTypeVC.swift */,
+				BC5EB4E4263DAD83006B9EE0 /* CreateTournyVC.swift */,
 				BC09A7C22672527600AD4BE0 /* JoinTournyVC.swift */,
 				BC4CE9EA264EC70700298C29 /* UserSelectionVC.swift */,
 				BC4CE9F82654294000298C29 /* InvitesVC.swift */,
@@ -213,7 +213,7 @@
 				BC5EB4D9263DAD83006B9EE0 /* Sources */,
 				BC5EB4DA263DAD83006B9EE0 /* Frameworks */,
 				BC5EB4DB263DAD83006B9EE0 /* Resources */,
-				72BDA2912D1AF20A7A2562E8 /* [CP] Embed Pods Frameworks */,
+				C9A1FBBCF4EF3EF1758465A8 /* [CP] Embed Pods Frameworks */,
 			);
 			buildRules = (
 			);
@@ -293,7 +293,7 @@
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
-		72BDA2912D1AF20A7A2562E8 /* [CP] Embed Pods Frameworks */ = {
+		C9A1FBBCF4EF3EF1758465A8 /* [CP] Embed Pods Frameworks */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -320,7 +320,7 @@
 				BCBC5447266F2D6700B10616 /* LoserVC.swift in Sources */,
 				BCA22DBE263DB3F300D460EB /* Extensions.swift in Sources */,
 				BC4CE9F52652D24A00298C29 /* Service.swift in Sources */,
-				BC5EB4E5263DAD83006B9EE0 /* TournyTypeVC.swift in Sources */,
+				BC5EB4E5263DAD83006B9EE0 /* CreateTournyVC.swift in Sources */,
 				BC4CE9F92654294000298C29 /* InvitesVC.swift in Sources */,
 				BC5ABDF5266E7EA5007C8035 /* PlayerCollectionCell.swift in Sources */,
 				BCBC5444266F29D400B10616 /* WinnerVC.swift in Sources */,
@@ -494,6 +494,10 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/BracketzFinal/Controller",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.tmcguiggan.BracketzFinal;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
@@ -513,6 +517,10 @@
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
+				);
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/BracketzFinal/Controller",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.tmcguiggan.BracketzFinal;
 				PRODUCT_NAME = "$(TARGET_NAME)";

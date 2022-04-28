@@ -38,7 +38,7 @@ class TabBarController: UITabBarController, UITabBarControllerDelegate, SideMenu
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         checkLoggedIn()
-        let view1 = TournyTypeVC()
+        let view1 = CreateTournyVC()
         let view2 = JoinTournyVC()
         let icon1 = UITabBarItem(title: "Create", image: UIImage(systemName: "plus"), selectedImage: UIImage(systemName: "plus"))
         let icon2 = UITabBarItem(title: "Join", image: UIImage(systemName: "person.3.fill"), selectedImage: UIImage(systemName: "person.3.fill"))
