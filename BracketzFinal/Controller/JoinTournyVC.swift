@@ -115,11 +115,11 @@ class JoinTournyVC: UIViewController, UIPickerViewDelegate, UIPickerViewDataSour
         joinTournyButton.anchor(left: view.leftAnchor, bottom: view.safeAreaLayoutGuide.bottomAnchor, right: view.rightAnchor, paddingLeft: 30, paddingBottom: 40, paddingRight: 30)
         
         let image = UIImage(systemName: "envelope")
-        navigationItem.rightBarButtonItem = UIBarButtonItem(image: image, style: .plain, target: self, action: #selector(presentInviteController))
+        navigationItem.rightBarButtonItem = UIBarButtonItem(image: image, style: .plain, target: self, action: #selector(presentInvitesController))
 
     }
     
-    @objc func presentInviteController() {
+    @objc func presentInvitesController() {
         let controller = InvitesVC()
         navigationController?.pushViewController(controller, animated: true)
     }
