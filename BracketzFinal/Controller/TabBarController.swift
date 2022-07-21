@@ -29,7 +29,7 @@ class TabBarController: UITabBarController, UITabBarControllerDelegate, SideMenu
         configureNavigationBar(withTitle: "BRACKETZ", prefersLargeTitles: false)
 
         let image = UIImage(systemName: "envelope.badge")
-        navigationItem.rightBarButtonItem = UIBarButtonItem(image: image, style: .plain, target: self, action: #selector(presentInviteController))
+        navigationItem.rightBarButtonItem = UIBarButtonItem(image: image, style: .plain, target: self, action: #selector(presentInvitesController))
         let image2 = UIImage(systemName: "line.horizontal.3")
         navigationItem.leftBarButtonItem = UIBarButtonItem(image: image2, style: .plain, target: self, action: #selector(presentMenu))
         
@@ -72,7 +72,7 @@ class TabBarController: UITabBarController, UITabBarControllerDelegate, SideMenu
         present(nav, animated: true, completion: nil)
     }
     
-    @objc func presentInviteController() {
+    @objc func presentInvitesController() {
         let controller = InvitesVC()
         navigationController?.pushViewController(controller, animated: true)
     }

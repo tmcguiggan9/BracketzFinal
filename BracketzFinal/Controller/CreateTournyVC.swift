@@ -10,9 +10,7 @@ import Firebase
 
 class CreateTournyVC: UIViewController, UIPickerViewDelegate, UIPickerViewDataSource {
     
-    var tournySize = 2
-    var sizeOptions = [2, 4, 8, 16]
-    var buyInOptions = ["$.25"]
+    var viewModel: CreateTournyViewModel?
     
     private let tournySizeLabel: UILabel = {
         let label = UILabel()
@@ -67,22 +65,8 @@ class CreateTournyVC: UIViewController, UIPickerViewDelegate, UIPickerViewDataSo
         //signOut()
         configureNavigationBar(withTitle: "BRACKETZ", prefersLargeTitles: false)
         checkLoggedIn()
-        
+        viewModel = CreateTournyViewModel(self)
     }
-    
-    func checkLoggedIn() {
-        if Auth.auth().currentUser == nil {
-            presentLoginScreen()
-        }
-    }
-    
-
-    @objc func presentUserSelectionVC() {
-        let controller = UserSelectionVC()
-        controller.tournySize = tournySize
-        navigationController?.pushViewController(controller, animated: true)
-    }
-    
     
     func configureUI() {
         view.backgroundColor = .white
@@ -103,34 +87,34 @@ class CreateTournyVC: UIViewController, UIPickerViewDelegate, UIPickerViewDataSo
         selectUsersButton.anchor(left: view.leftAnchor, bottom: view.safeAreaLayoutGuide.bottomAnchor, right: view.rightAnchor, paddingLeft: 30, paddingBottom: 40, paddingRight: 30)
         
         let image = UIImage(systemName: "envelope.badge")
-        navigationItem.rightBarButtonItem = UIBarButtonItem(image: image, style: .plain, target: self, action: #selector(presentInviteController))
+        navigationItem.rightBarButtonItem = UIBarButtonItem(image: image, style: .plain, target: self, action: #selector(presentInvitesController))
         let image2 = UIImage(systemName: "line.horizontal.3")
         navigationItem.leftBarButtonItem = UIBarButtonItem(image: image2, style: .plain, target: self, action: #selector(presentMenu))
         
         // presentLoginScreen()
-        
+    }
+    
+    func checkLoggedIn() {
+        if Auth.auth().currentUser == nil {
+            presentLoginScreen()
+        }
+    }
+    
+    @objc func presentUserSelectionVC() {
+        viewModel!.presentUserSelectionVC()
     }
     
     @objc func presentMenu() {
-        let controller = SideMenuVC()
-        controller.delegate = self
-        let nav = UINavigationController(rootViewController: controller)
-        nav.modalPresentationStyle = .fullScreen
-        present(nav, animated: true, completion: nil)
+        viewModel!.presentMenu()
     }
     
-    @objc func presentInviteController() {
-        let controller = InvitesVC()
-        navigationController?.pushViewController(controller, animated: true)
+    @objc func presentInvitesController() {
+        viewModel!.presentInvitesController()
     }
-    
     
     func presentLoginScreen() {
         DispatchQueue.main.async {
-            let controller = LoginController()
-            let nav = UINavigationController(rootViewController: controller)
-            nav.modalPresentationStyle = .fullScreen
-            self.present(nav, animated: true, completion: nil)
+            self.viewModel!.presentLoginScreen()
         }
     }
     
@@ -140,26 +124,25 @@ class CreateTournyVC: UIViewController, UIPickerViewDelegate, UIPickerViewDataSo
     
     func pickerView(_ pickerView: UIPickerView, numberOfRowsInComponent component: Int) -> Int {
         if pickerView == sizePicker {
-            return sizeOptions.count
+            return viewModel!.sizeOptions.count
         } else {
-            return buyInOptions.count
+            return viewModel!.buyInOptions.count
         }
-        
     }
     
     func pickerView(_ pickerView: UIPickerView, titleForRow row: Int, forComponent component: Int) -> String? {
         if pickerView == sizePicker {
-            let row = String(sizeOptions[row])
+            let row = String(viewModel!.sizeOptions[row])
             return row
         } else {
-            let row = buyInOptions[row]
+            let row = viewModel!.buyInOptions[row]
             return row
         }
         
     }
     
     func pickerView(_ pickerView: UIPickerView, didSelectRow row: Int, inComponent component: Int) {
-        tournySize = sizeOptions[row]
+        viewModel!.tournySize = viewModel!.sizeOptions[row]
     }
     
     func signOut() {
