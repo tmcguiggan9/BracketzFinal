@@ -8,7 +8,6 @@
 
 /* Begin PBXBuildFile section */
 		BC09A7BF26724C5100AD4BE0 /* TabBarController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC09A7BE26724C5100AD4BE0 /* TabBarController.swift */; };
-		BC09A7C32672527600AD4BE0 /* JoinTournyVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC09A7C22672527600AD4BE0 /* JoinTournyVC.swift */; };
 		BC3966AF264DB0F00079137E /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = BC3966AE264DB0F00079137E /* GoogleService-Info.plist */; };
 		BC3966F1264DDECB0079137E /* User.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC3966F0264DDECB0079137E /* User.swift */; };
 		BC3966F4264DDEFF0079137E /* Match.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC3966F3264DDEFF0079137E /* Match.swift */; };
@@ -21,7 +20,7 @@
 		BC5ABDF5266E7EA5007C8035 /* PlayerCollectionCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC5ABDF4266E7EA5007C8035 /* PlayerCollectionCell.swift */; };
 		BC5EB4E1263DAD83006B9EE0 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC5EB4E0263DAD83006B9EE0 /* AppDelegate.swift */; };
 		BC5EB4E3263DAD83006B9EE0 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC5EB4E2263DAD83006B9EE0 /* SceneDelegate.swift */; };
-		BC5EB4E5263DAD83006B9EE0 /* CreateTournyVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC5EB4E4263DAD83006B9EE0 /* CreateTournyVC.swift */; };
+		BC5EB4E5263DAD83006B9EE0 /* TournamentBuilderVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC5EB4E4263DAD83006B9EE0 /* TournamentBuilderVC.swift */; };
 		BC5EB4E8263DAD83006B9EE0 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = BC5EB4E6263DAD83006B9EE0 /* Main.storyboard */; };
 		BC5EB4EA263DAD84006B9EE0 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = BC5EB4E9263DAD84006B9EE0 /* Assets.xcassets */; };
 		BC5EB4ED263DAD84006B9EE0 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = BC5EB4EB263DAD84006B9EE0 /* LaunchScreen.storyboard */; };
@@ -33,7 +32,7 @@
 		BCBC5440266ECF2200B10616 /* SideMenuVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCBC543F266ECF2200B10616 /* SideMenuVC.swift */; };
 		BCBC5444266F29D400B10616 /* WinnerVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCBC5443266F29D400B10616 /* WinnerVC.swift */; };
 		BCBC5447266F2D6700B10616 /* LoserVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCBC5446266F2D6700B10616 /* LoserVC.swift */; };
-		BCCB8F302888AEE700702AE8 /* CreateTournyVIewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCCB8F2F2888AEE700702AE8 /* CreateTournyVIewModel.swift */; };
+		BCCB8F302888AEE700702AE8 /* TournamentBuilderVIewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCCB8F2F2888AEE700702AE8 /* TournamentBuilderVIewModel.swift */; };
 		BCD79B67265BED8600656C10 /* MatchPlayVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCD79B66265BED8600656C10 /* MatchPlayVC.swift */; };
 		E7695096156670FBE2A753C7 /* Pods_BracketzFinal.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 512CEE89675D13137828DF71 /* Pods_BracketzFinal.framework */; };
 /* End PBXBuildFile section */
@@ -43,7 +42,6 @@
 		512CEE89675D13137828DF71 /* Pods_BracketzFinal.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_BracketzFinal.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		AA15E00F549208114A9A5DCE /* Pods-BracketzFinal.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-BracketzFinal.debug.xcconfig"; path = "Target Support Files/Pods-BracketzFinal/Pods-BracketzFinal.debug.xcconfig"; sourceTree = "<group>"; };
 		BC09A7BE26724C5100AD4BE0 /* TabBarController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabBarController.swift; sourceTree = "<group>"; };
-		BC09A7C22672527600AD4BE0 /* JoinTournyVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JoinTournyVC.swift; sourceTree = "<group>"; };
 		BC3966AE264DB0F00079137E /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		BC3966F0264DDECB0079137E /* User.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = User.swift; sourceTree = "<group>"; };
 		BC3966F3264DDEFF0079137E /* Match.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Match.swift; sourceTree = "<group>"; };
@@ -57,7 +55,7 @@
 		BC5EB4DD263DAD83006B9EE0 /* BracketzFinal.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = BracketzFinal.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		BC5EB4E0263DAD83006B9EE0 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		BC5EB4E2263DAD83006B9EE0 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
-		BC5EB4E4263DAD83006B9EE0 /* CreateTournyVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateTournyVC.swift; sourceTree = "<group>"; };
+		BC5EB4E4263DAD83006B9EE0 /* TournamentBuilderVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TournamentBuilderVC.swift; sourceTree = "<group>"; };
 		BC5EB4E7263DAD83006B9EE0 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		BC5EB4E9263DAD84006B9EE0 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		BC5EB4EC263DAD84006B9EE0 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
@@ -70,7 +68,7 @@
 		BCBC543F266ECF2200B10616 /* SideMenuVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SideMenuVC.swift; sourceTree = "<group>"; };
 		BCBC5443266F29D400B10616 /* WinnerVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WinnerVC.swift; sourceTree = "<group>"; };
 		BCBC5446266F2D6700B10616 /* LoserVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoserVC.swift; sourceTree = "<group>"; };
-		BCCB8F2F2888AEE700702AE8 /* CreateTournyVIewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateTournyVIewModel.swift; sourceTree = "<group>"; };
+		BCCB8F2F2888AEE700702AE8 /* TournamentBuilderVIewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TournamentBuilderVIewModel.swift; sourceTree = "<group>"; };
 		BCD79B66265BED8600656C10 /* MatchPlayVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatchPlayVC.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -154,8 +152,7 @@
 			isa = PBXGroup;
 			children = (
 				BC4CE9EF264ED1A200298C29 /* Authentication  */,
-				BC5EB4E4263DAD83006B9EE0 /* CreateTournyVC.swift */,
-				BC09A7C22672527600AD4BE0 /* JoinTournyVC.swift */,
+				BC5EB4E4263DAD83006B9EE0 /* TournamentBuilderVC.swift */,
 				BC4CE9EA264EC70700298C29 /* UserSelectionVC.swift */,
 				BC4CE9F82654294000298C29 /* InvitesVC.swift */,
 				BC4CE9FB265440DC00298C29 /* LobbyVC.swift */,
@@ -208,7 +205,7 @@
 		BCCB8F2E2888AEA100702AE8 /* ViewModels */ = {
 			isa = PBXGroup;
 			children = (
-				BCCB8F2F2888AEE700702AE8 /* CreateTournyVIewModel.swift */,
+				BCCB8F2F2888AEE700702AE8 /* TournamentBuilderVIewModel.swift */,
 			);
 			path = ViewModels;
 			sourceTree = "<group>";
@@ -331,11 +328,11 @@
 				BCBC5447266F2D6700B10616 /* LoserVC.swift in Sources */,
 				BCA22DBE263DB3F300D460EB /* Extensions.swift in Sources */,
 				BC4CE9F52652D24A00298C29 /* Service.swift in Sources */,
-				BC5EB4E5263DAD83006B9EE0 /* CreateTournyVC.swift in Sources */,
+				BC5EB4E5263DAD83006B9EE0 /* TournamentBuilderVC.swift in Sources */,
 				BC4CE9F92654294000298C29 /* InvitesVC.swift in Sources */,
 				BC5ABDF5266E7EA5007C8035 /* PlayerCollectionCell.swift in Sources */,
 				BCBC5444266F29D400B10616 /* WinnerVC.swift in Sources */,
-				BCCB8F302888AEE700702AE8 /* CreateTournyVIewModel.swift in Sources */,
+				BCCB8F302888AEE700702AE8 /* TournamentBuilderVIewModel.swift in Sources */,
 				BCA22DC2263DB55800D460EB /* InputContainerView.swift in Sources */,
 				BC09A7BF26724C5100AD4BE0 /* TabBarController.swift in Sources */,
 				BC4CE9EB264EC70700298C29 /* UserSelectionVC.swift in Sources */,
@@ -348,7 +345,6 @@
 				BCA22DC5263DB62600D460EB /* CustomTextField.swift in Sources */,
 				BC3966F1264DDECB0079137E /* User.swift in Sources */,
 				BC5EB4E1263DAD83006B9EE0 /* AppDelegate.swift in Sources */,
-				BC09A7C32672527600AD4BE0 /* JoinTournyVC.swift in Sources */,
 				BCA22DBB263DB35100D460EB /* RegistrationController.swift in Sources */,
 				BC5EB4E3263DAD83006B9EE0 /* SceneDelegate.swift in Sources */,
 				BCBC5440266ECF2200B10616 /* SideMenuVC.swift in Sources */,

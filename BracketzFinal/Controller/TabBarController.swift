@@ -9,6 +9,9 @@ import UIKit
 import Firebase
 
 class TabBarController: UITabBarController, UITabBarControllerDelegate, SideMenuVCDelegate {
+    
+    let view1 = TournamentBuilderVC(tournamentType: .create)
+    let view2 = TournamentBuilderVC(tournamentType: .join)
     func handleLogout() {
         do {
             try Auth.auth().signOut()
@@ -38,8 +41,8 @@ class TabBarController: UITabBarController, UITabBarControllerDelegate, SideMenu
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         checkLoggedIn()
-        let view1 = CreateTournyVC()
-        let view2 = JoinTournyVC()
+//        let view1 = TournamentBuilderVC(tournamentType: .create)
+//        let view2 = TournamentBuilderVC(tournamentType: .join)
         let icon1 = UITabBarItem(title: "Create", image: UIImage(systemName: "plus"), selectedImage: UIImage(systemName: "plus"))
         let icon2 = UITabBarItem(title: "Join", image: UIImage(systemName: "person.3.fill"), selectedImage: UIImage(systemName: "person.3.fill"))
         view1.tabBarItem = icon1
