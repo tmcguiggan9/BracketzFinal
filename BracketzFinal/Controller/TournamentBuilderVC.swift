@@ -8,11 +8,17 @@
 import UIKit
 import Firebase
 
-class CreateTournyVC: UIViewController, UIPickerViewDelegate, UIPickerViewDataSource {
+class TournamentBuilderVC: UIViewController, UIPickerViewDelegate, UIPickerViewDataSource {
     
-    var tournySize = 2
-    var sizeOptions = [2, 4, 8, 16]
-    var buyInOptions = ["$.25"]
+    var viewModel: TournamentBuilderViewModel?
+    var tournamentType: TournamentType?
+    
+    
+    init(tournamentType: TournamentType) {
+        self.tournamentType = tournamentType
+        super.init(nibName: nil, bundle: nil)
+    }
+    
     
     private let tournySizeLabel: UILabel = {
         let label = UILabel()
@@ -40,9 +46,8 @@ class CreateTournyVC: UIViewController, UIPickerViewDelegate, UIPickerViewDataSo
         return picker
     }()
     
-    private let selectUsersButton: UIButton = {
+    private let tournamentActionButton: UIButton = {
         let button = UIButton(type: .system)
-        button.setTitle("Create Tournament", for: .normal)
         button.layer.cornerRadius = 5
         button.titleLabel?.font = UIFont.boldSystemFont(ofSize: 20)
         button.backgroundColor = #colorLiteral(red: 0.8351245241, green: 0.8433930838, blue: 0.8433930838, alpha: 1)
@@ -51,7 +56,7 @@ class CreateTournyVC: UIViewController, UIPickerViewDelegate, UIPickerViewDataSo
         button.setTitleColor(#colorLiteral(red: 0.04823023291, green: 0.04672234866, blue: 0.1949952411, alpha: 1) , for: .normal)
         button.setHeight(height: 50)
         button.isEnabled = true
-        button.addTarget(self, action: #selector(presentUserSelectionVC), for: .touchUpInside)
+        button.addTarget(self, action: #selector(presentNextVC), for: .touchUpInside)
         return button
     }()
     
@@ -64,25 +69,10 @@ class CreateTournyVC: UIViewController, UIPickerViewDelegate, UIPickerViewDataSo
         buyInPicker.delegate = self as UIPickerViewDelegate
         buyInPicker.dataSource = self as UIPickerViewDataSource
         configureUI()
-        //signOut()
+        configureButton()
         configureNavigationBar(withTitle: "BRACKETZ", prefersLargeTitles: false)
-        checkLoggedIn()
-        
+        viewModel = TournamentBuilderViewModel(self)
     }
-    
-    func checkLoggedIn() {
-        if Auth.auth().currentUser == nil {
-            presentLoginScreen()
-        }
-    }
-    
-
-    @objc func presentUserSelectionVC() {
-        let controller = UserSelectionVC()
-        controller.tournySize = tournySize
-        navigationController?.pushViewController(controller, animated: true)
-    }
-    
     
     func configureUI() {
         view.backgroundColor = .white
@@ -99,40 +89,42 @@ class CreateTournyVC: UIViewController, UIPickerViewDelegate, UIPickerViewDataSo
         view.addSubview(buyInPicker)
         buyInPicker.anchor(top: buyInLabel.bottomAnchor, left: view.leftAnchor, right: view.rightAnchor, paddingTop: -25, paddingLeft: 30, paddingRight: 30)
         
-        view.addSubview(selectUsersButton)
-        selectUsersButton.anchor(left: view.leftAnchor, bottom: view.safeAreaLayoutGuide.bottomAnchor, right: view.rightAnchor, paddingLeft: 30, paddingBottom: 40, paddingRight: 30)
-        
-        let image = UIImage(systemName: "envelope.badge")
-        navigationItem.rightBarButtonItem = UIBarButtonItem(image: image, style: .plain, target: self, action: #selector(presentInviteController))
-        let image2 = UIImage(systemName: "line.horizontal.3")
-        navigationItem.leftBarButtonItem = UIBarButtonItem(image: image2, style: .plain, target: self, action: #selector(presentMenu))
-        
-        // presentLoginScreen()
-        
+        view.addSubview(tournamentActionButton)
+        tournamentActionButton.anchor(left: view.leftAnchor, bottom: view.safeAreaLayoutGuide.bottomAnchor, right: view.rightAnchor, paddingLeft: 30, paddingBottom: 40, paddingRight: 30)
     }
     
-    @objc func presentMenu() {
-        let controller = SideMenuVC()
-        controller.delegate = self
-        let nav = UINavigationController(rootViewController: controller)
-        nav.modalPresentationStyle = .fullScreen
-        present(nav, animated: true, completion: nil)
-    }
-    
-    @objc func presentInviteController() {
-        let controller = InvitesVC()
-        navigationController?.pushViewController(controller, animated: true)
-    }
-    
-    
-    func presentLoginScreen() {
-        DispatchQueue.main.async {
-            let controller = LoginController()
-            let nav = UINavigationController(rootViewController: controller)
-            nav.modalPresentationStyle = .fullScreen
-            self.present(nav, animated: true, completion: nil)
+    func configureButton() {
+        switch tournamentType {
+        case .create:
+            tournamentActionButton.setTitle("Create Tournament", for: .normal)
+        case .join:
+            tournamentActionButton.setTitle("Join Tournament", for: .normal)
+        default:
+            return
         }
     }
+    
+    
+    @objc func presentNextVC() {
+        switch tournamentType {
+        case .create:
+            userSelection()
+        case .join:
+            searchForTourny()
+        default:
+            return
+        }
+    }
+    
+    func userSelection() {
+        viewModel!.presentUserSelectionVC()
+    }
+    
+    func searchForTourny() {
+        guard let currentUser = viewModel!.currentUser else { return }
+        Service.shared.findPublicTournament(tournySize: viewModel!.tournySize, currentUser: currentUser, view: self)
+    }
+    
     
     func numberOfComponents(in pickerView: UIPickerView) -> Int {
         1
@@ -140,44 +132,30 @@ class CreateTournyVC: UIViewController, UIPickerViewDelegate, UIPickerViewDataSo
     
     func pickerView(_ pickerView: UIPickerView, numberOfRowsInComponent component: Int) -> Int {
         if pickerView == sizePicker {
-            return sizeOptions.count
+            return viewModel!.sizeOptions.count
         } else {
-            return buyInOptions.count
+            return viewModel!.buyInOptions.count
         }
-        
     }
     
     func pickerView(_ pickerView: UIPickerView, titleForRow row: Int, forComponent component: Int) -> String? {
         if pickerView == sizePicker {
-            let row = String(sizeOptions[row])
+            let row = String(viewModel!.sizeOptions[row])
             return row
         } else {
-            let row = buyInOptions[row]
+            let row = viewModel!.buyInOptions[row]
             return row
         }
         
     }
     
     func pickerView(_ pickerView: UIPickerView, didSelectRow row: Int, inComponent component: Int) {
-        tournySize = sizeOptions[row]
+        viewModel!.tournySize = viewModel!.sizeOptions[row]
     }
     
-    func signOut() {
-        do {
-            try Auth.auth().signOut()
-            DispatchQueue.main.async {
-                let nav = UINavigationController(rootViewController: LoginController())
-                nav.modalPresentationStyle = .fullScreen
-                self.present(nav, animated: true, completion: nil)
-            }
-        } catch {
-            print("error signing out")
-        }
+    required init?(coder aDecoder: NSCoder) {
+        super.init(coder: aDecoder)
     }
+    
 }
 
-extension CreateTournyVC: SideMenuVCDelegate {
-    func handleLogout() {
-        signOut()
-    }
-}

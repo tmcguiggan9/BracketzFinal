@@ -9,6 +9,9 @@ import UIKit
 import Firebase
 
 class TabBarController: UITabBarController, UITabBarControllerDelegate, SideMenuVCDelegate {
+    
+    let view1 = TournamentBuilderVC(tournamentType: .create)
+    let view2 = TournamentBuilderVC(tournamentType: .join)
     func handleLogout() {
         do {
             try Auth.auth().signOut()
@@ -29,7 +32,7 @@ class TabBarController: UITabBarController, UITabBarControllerDelegate, SideMenu
         configureNavigationBar(withTitle: "BRACKETZ", prefersLargeTitles: false)
 
         let image = UIImage(systemName: "envelope.badge")
-        navigationItem.rightBarButtonItem = UIBarButtonItem(image: image, style: .plain, target: self, action: #selector(presentInviteController))
+        navigationItem.rightBarButtonItem = UIBarButtonItem(image: image, style: .plain, target: self, action: #selector(presentInvitesController))
         let image2 = UIImage(systemName: "line.horizontal.3")
         navigationItem.leftBarButtonItem = UIBarButtonItem(image: image2, style: .plain, target: self, action: #selector(presentMenu))
         
@@ -38,8 +41,8 @@ class TabBarController: UITabBarController, UITabBarControllerDelegate, SideMenu
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         checkLoggedIn()
-        let view1 = CreateTournyVC()
-        let view2 = JoinTournyVC()
+//        let view1 = TournamentBuilderVC(tournamentType: .create)
+//        let view2 = TournamentBuilderVC(tournamentType: .join)
         let icon1 = UITabBarItem(title: "Create", image: UIImage(systemName: "plus"), selectedImage: UIImage(systemName: "plus"))
         let icon2 = UITabBarItem(title: "Join", image: UIImage(systemName: "person.3.fill"), selectedImage: UIImage(systemName: "person.3.fill"))
         view1.tabBarItem = icon1
@@ -72,7 +75,7 @@ class TabBarController: UITabBarController, UITabBarControllerDelegate, SideMenu
         present(nav, animated: true, completion: nil)
     }
     
-    @objc func presentInviteController() {
+    @objc func presentInvitesController() {
         let controller = InvitesVC()
         navigationController?.pushViewController(controller, animated: true)
     }
