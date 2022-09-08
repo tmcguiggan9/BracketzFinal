@@ -30,46 +30,22 @@ class MatchPlayVC: UIViewController {
     
     
     
-    private let rockButton: UIButton = {
-        let button = UIButton()
-        let image = #imageLiteral(resourceName: "Fist2x")
-        let tintedImage = image.withRenderingMode(.alwaysTemplate)
-        button.setImage(tintedImage, for: .normal)
-        button.tintColor = .black
-        button.imageEdgeInsets = UIEdgeInsets(top: 12,left: 20,bottom: 12,right: 20)
-        button.layer.borderWidth = 3
-        button.layer.borderColor = #colorLiteral(red: 0, green: 0, blue: 0, alpha: 1)
-        button.setTitle("rock", for: .normal)
+    private let rockButton: MoveButton = {
+        let button = MoveButton(image: #imageLiteral(resourceName: "FIST"), move: "rock")
         button.addTarget(self, action: #selector(moveSelected(_:)), for: .touchUpInside)
         return button
     }()
     
     
-    private let paperButton: UIButton = {
-        let button = UIButton()
-        let image = #imageLiteral(resourceName: "Paper2x")
-        let tintedImage = image.withRenderingMode(.alwaysTemplate)
-        button.setImage(tintedImage, for: .normal)
-        button.tintColor = .black
-        button.imageEdgeInsets = UIEdgeInsets(top: 12,left: 20,bottom: 12,right: 20)
-        button.layer.borderWidth = 3
-        button.layer.borderColor = #colorLiteral(red: 0, green: 0, blue: 0, alpha: 1)
-        button.setTitle("paper", for: .normal)
+    private let paperButton: MoveButton = {
+        let button = MoveButton(image: #imageLiteral(resourceName: "Paper2x"), move: "paper")
         button.addTarget(self, action: #selector(moveSelected(_:)), for: .touchUpInside)
         return button
     }()
     
     
-    private let scissorsButton: UIButton = {
-        let button = UIButton()
-        let image = #imageLiteral(resourceName: "Scissors")
-        let tintedImage = image.withRenderingMode(.alwaysTemplate)
-        button.setImage(tintedImage, for: .normal)
-        button.tintColor = .black
-        button.imageEdgeInsets = UIEdgeInsets(top: 12,left: 12,bottom: 12,right: 12)
-        button.layer.borderWidth = 3
-        button.layer.borderColor = #colorLiteral(red: 0, green: 0, blue: 0, alpha: 1)
-        button.setTitle("scissors", for: .normal)
+    private let scissorsButton: MoveButton = {
+        let button = MoveButton(image: #imageLiteral(resourceName: "Scissors"), move: "scissors")
         button.addTarget(self, action: #selector(moveSelected(_:)), for: .touchUpInside)
         return button
     }()

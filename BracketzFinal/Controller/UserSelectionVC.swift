@@ -13,31 +13,29 @@ import Firebase
 
 
 class UserSelectionVC: UIViewController, UISearchControllerDelegate, UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout{
-  
-    var tournySize: Int?
-    var tournyUsers = [String]()
-    var finalTournyUsers = [User]()
+    
+    var presenter: UserSelectionPresenter?
     
     private let tableView = UITableView()
     
+    init(currentUser: User, tournySize: Int) {
+        super.init(nibName: nil, bundle: nil)
+        
+        presenter = UserSelectionPresenter(self, tournySize: tournySize, currentUser: currentUser)
+        fetchAllUsers()
+        configureSearchController()
+        configureUI()
+    }
     
-    private var users: [User]? {
+    //currently we are loading ALL users present in database to display in tableView when user is selecting opponents. This will not be feasible once the user base grows
+    //users should only display once currentUser has typed something into the search bar
+    var usersFoundBySearch: [User]? {
         didSet {
-            if let index = users!.firstIndex(of: currentUser!) {
-                users!.remove(at: index)
+            if let index = usersFoundBySearch!.firstIndex(of: presenter!.currentUser) {
+                usersFoundBySearch!.remove(at: index)
             }
             configureTableView()
             tableView.reloadData()
-        }
-    }
-    
-    private var currentUser: User? {
-        didSet {
-            fetchAllUsers()
-            finalTournyUsers.append(currentUser!)
-            configureSearchController()
-            configureUI()
-            tournyUsers.append(currentUser!.uid)
         }
     }
     
@@ -63,7 +61,7 @@ class UserSelectionVC: UIViewController, UISearchControllerDelegate, UICollectio
         button.setTitleColor(.gray, for: .normal)
         button.setHeight(height: 50)
         button.isEnabled = false
-        button.addTarget(self, action: #selector(sendInvites), for: .touchUpInside)
+        button.addTarget(self, action: #selector(sendInvitesAndCreateTournament), for: .touchUpInside)
         return button
     }()
     
@@ -80,49 +78,32 @@ class UserSelectionVC: UIViewController, UISearchControllerDelegate, UICollectio
         return button
     }()
     
-    
     override func viewDidLoad() {
         super.viewDidLoad()
         collectionView.delegate = self
         collectionView.dataSource = self
         collectionView.register(PlayerCollectionCell.self, forCellWithReuseIdentifier: "PlayerCollectionCell")
-        fetchCurrentUser()
         navigationItem.setHidesBackButton(true, animated: false)
-        
-        
         searchController.delegate = self
         view.backgroundColor = #colorLiteral(red: 0.9254901961, green: 0.9411764706, blue: 0.9450980392, alpha: 1)
     }
     
-    
     @objc func cancelTournament() {
-        navigationController?.popViewController(animated: true)
-
+        presenter?.cancelTournament()
     }
     
-    
-    @objc func sendInvites() {
+    @objc func sendInvitesAndCreateTournament() {
         navigationItem.hidesBackButton = true
         sendInviteButton.isEnabled = false
         sendInviteButton.backgroundColor = .gray
         
-        Service.shared.sendInvitesAndCreateTournament(tournyUsers: tournyUsers, tournySize: tournySize!, view: self)
+        presenter?.sendInvitesAndCreateTournament()
     }
     
     func fetchAllUsers() {
-        Service.shared.fetchUsers { (users) in
-            self.users = users
-        }
+        presenter?.fetchUsers()
     }
-    
-    func fetchCurrentUser() {
-        guard let currentUid = Auth.auth().currentUser?.uid else {return}
-        Service.shared.fetchUserData(uid: currentUid) { (currentUser) in
-            self.currentUser = currentUser
-        }
-    }
-    
-    
+
     func configureUI() {
         let stack2 = UIStackView(arrangedSubviews: [sendInviteButton, cancelButton])
         stack2.axis = .vertical
@@ -134,31 +115,24 @@ class UserSelectionVC: UIViewController, UISearchControllerDelegate, UICollectio
         collectionView.anchor(top: view.safeAreaLayoutGuide.topAnchor, left: view.leftAnchor, bottom: stack2.topAnchor, right: view.rightAnchor, paddingTop: 8, paddingLeft: 8, paddingBottom: 8, paddingRight: 8)
     }
     
-    
     func configureTableView() {
         tableView.delegate = self
         tableView.dataSource = self
-        
         tableView.register(UITableViewCell.self, forCellReuseIdentifier: "User Cell")
         tableView.rowHeight = 60
         tableView.tableFooterView = UIView()
         
         let height = view.frame.height - 100
         tableView.frame = CGRect(x: 0, y: view.frame.height, width: view.frame.width, height: height)
-        
-        
-        
+    
         view.addSubview(tableView)
     }
-    
     
     func configureSearchController() {
         searchController.searchResultsUpdater = self
         searchController.searchBar.showsCancelButton = true
         searchController.obscuresBackgroundDuringPresentation = false
         searchController.hidesNavigationBarDuringPresentation = false
-        
-        
         navigationItem.hidesSearchBarWhenScrolling = false
         searchController.searchBar.placeholder = "Add users..."
         navigationItem.searchController = searchController
@@ -171,40 +145,35 @@ class UserSelectionVC: UIViewController, UISearchControllerDelegate, UICollectio
         }
     }
     
-    
     func presentSearchController(_ searchController: UISearchController) {
         tableView.frame.origin.y = 100
     }
-    
     
     func didDismissSearchController(_ searchController: UISearchController) {
         tableView.frame.origin.y = view.frame.height
     }
     
-    
     func updateUsers() {
         collectionView.reloadData()
         
-        if finalTournyUsers.count == tournySize {
+        if presenter!.finalTournyUsers.count == presenter!.tournySize {
             sendInviteButton.isEnabled = true
             searchController.searchBar.isUserInteractionEnabled = false
             searchController.searchBar.placeholder = "Tournament is full"
             sendInviteButton.setTitleColor(.white, for: .normal)
         }
-
         configureUI()
         configureTableView()
     }
     
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return finalTournyUsers.count
+        return presenter!.finalTournyUsers.count
     }
-    
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "PlayerCollectionCell", for: indexPath) as! PlayerCollectionCell
-        cell.user = finalTournyUsers[indexPath.row]
+        cell.user = presenter!.finalTournyUsers[indexPath.row]
         return cell
     }
     
@@ -213,11 +182,10 @@ class UserSelectionVC: UIViewController, UISearchControllerDelegate, UICollectio
         return .init(top: 16, left: 0, bottom: 16, right: 0)
     }
     
-    
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         let frame = CGRect(x: 0, y: 0, width: view.frame.width - 50, height: 70)
         let estimatedSizeCell = PlayerCollectionCell(frame: frame)
-        estimatedSizeCell.user = finalTournyUsers[indexPath.row]
+        estimatedSizeCell.user = presenter!.finalTournyUsers[indexPath.row]
         estimatedSizeCell.layoutIfNeeded()
         
         let targetSize = CGSize(width: view.frame.width - 50, height: 70)
@@ -226,7 +194,9 @@ class UserSelectionVC: UIViewController, UISearchControllerDelegate, UICollectio
         return .init(width: view.frame.width - 50, height: estimatedSize.height)
     }
     
-    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
 }
 
 extension UserSelectionVC: UISearchResultsUpdating {
@@ -236,28 +206,25 @@ extension UserSelectionVC: UISearchResultsUpdating {
 }
 
 
-
 extension UserSelectionVC: UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return users!.count
+        return usersFoundBySearch!.count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "User Cell", for: indexPath)
-        cell.textLabel?.text = users![indexPath.row].username
-        if users![indexPath.row].username == currentUser?.username {
+        cell.textLabel?.text = usersFoundBySearch![indexPath.row].username
+        if usersFoundBySearch![indexPath.row].username == presenter!.currentUser.username {
             cell.isHidden = true
         }
         return cell
-        
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        tournyUsers.append(users![indexPath.row].uid)
-        finalTournyUsers.append(users![indexPath.row])
-        users?.remove(at: indexPath.row)
+        presenter!.tournyUsers.append(usersFoundBySearch![indexPath.row].uid)
+        presenter!.finalTournyUsers.append(usersFoundBySearch![indexPath.row])
+        usersFoundBySearch?.remove(at: indexPath.row)
         updateUsers()
         searchController.isActive = false
-        
     }
 }

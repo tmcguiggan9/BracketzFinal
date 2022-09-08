@@ -12,6 +12,8 @@ class TabBarController: UITabBarController, UITabBarControllerDelegate, SideMenu
     
     let view1 = TournamentBuilderVC(tournamentType: .create)
     let view2 = TournamentBuilderVC(tournamentType: .join)
+    let currentUser = Auth.auth().currentUser
+    
     func handleLogout() {
         do {
             try Auth.auth().signOut()
@@ -32,7 +34,7 @@ class TabBarController: UITabBarController, UITabBarControllerDelegate, SideMenu
         configureNavigationBar(withTitle: "BRACKETZ", prefersLargeTitles: false)
 
         let image = UIImage(systemName: "envelope.badge")
-        navigationItem.rightBarButtonItem = UIBarButtonItem(image: image, style: .plain, target: self, action: #selector(presentInvitesController))
+        navigationItem.rightBarButtonItem = UIBarButtonItem(image: image, style: .plain, target: self, action: #selector(fetchCurrentUserData))
         let image2 = UIImage(systemName: "line.horizontal.3")
         navigationItem.leftBarButtonItem = UIBarButtonItem(image: image2, style: .plain, target: self, action: #selector(presentMenu))
         
@@ -50,6 +52,14 @@ class TabBarController: UITabBarController, UITabBarControllerDelegate, SideMenu
         let controllers = [view1, view2]
         self.viewControllers = controllers
     
+    }
+    
+    @objc func fetchCurrentUserData() {
+        guard let currentUser = currentUser else { return }
+        Service.shared.fetchUserData(uid: currentUser.uid) { (currentUserData) in
+            self.presentInvitesController(currentUserData: currentUserData)
+            print("Debug: Current User is \(currentUserData)")
+        }
     }
     
     func checkLoggedIn() {
@@ -75,8 +85,8 @@ class TabBarController: UITabBarController, UITabBarControllerDelegate, SideMenu
         present(nav, animated: true, completion: nil)
     }
     
-    @objc func presentInvitesController() {
-        let controller = InvitesVC()
+    func presentInvitesController(currentUserData: User) {
+        let controller = InvitesVC(currentUser: currentUserData)
         navigationController?.pushViewController(controller, animated: true)
     }
     

@@ -76,7 +76,7 @@ struct Service {
         REF_TOURNAMENTS.child(uid).child("acceptedUsers").removeAllObservers()
     }
     
-    func findPublicTournament(tournySize: Int, currentUser: String, view: UIViewController) {
+    func findPublicTournament(tournySize: Int, currentUserId: String, view: UIViewController) {
         var tournyUsers = [String]()
         REF_TOURNAMENTS.observeSingleEvent(of: .value) { (snapshot) in
             if let tournys = snapshot.value as? [String: Any] {
@@ -95,7 +95,7 @@ struct Service {
                             } else {
                                 tourny!["acceptedUsers"] = tourny!["acceptedUsers"] as! Int + 1
                                 tournyUsers = (tourny!["tournamentUsers"] as? [String])!
-                                tournyUsers.append(currentUser)
+                                tournyUsers.append(currentUserId)
                                 tourny!["tournamentUsers"] = tournyUsers
                                 
                                 currentData.value = tourny
@@ -122,7 +122,7 @@ struct Service {
                     }
                 }
             }
-            let values = ["tournamentUsers": [currentUser], "acceptedUsers": 1, "isPublic": true, "tournySize": tournySize] as [String: Any]
+            let values = ["tournamentUsers": [currentUserId], "acceptedUsers": 1, "isPublic": true, "tournySize": tournySize] as [String: Any]
             REF_TOURNAMENTS.childByAutoId().updateChildValues(values) { (error, ref) in
                 
                 REF_TOURNAMENTS.child(ref.key!).child("tournamentUsers").observe(.value) { (snapshot) in

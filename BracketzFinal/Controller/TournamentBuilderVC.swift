@@ -10,7 +10,7 @@ import Firebase
 
 class TournamentBuilderVC: UIViewController, UIPickerViewDelegate, UIPickerViewDataSource {
     
-    var viewModel: TournamentBuilderViewModel?
+    var presenter: TournamentBuilderPresenter?
     var tournamentType: TournamentType?
     
     
@@ -71,7 +71,7 @@ class TournamentBuilderVC: UIViewController, UIPickerViewDelegate, UIPickerViewD
         configureUI()
         configureButton()
         configureNavigationBar(withTitle: "BRACKETZ", prefersLargeTitles: false)
-        viewModel = TournamentBuilderViewModel(self)
+        presenter = TournamentBuilderPresenter(self)
     }
     
     func configureUI() {
@@ -93,6 +93,7 @@ class TournamentBuilderVC: UIViewController, UIPickerViewDelegate, UIPickerViewD
         tournamentActionButton.anchor(left: view.leftAnchor, bottom: view.safeAreaLayoutGuide.bottomAnchor, right: view.rightAnchor, paddingLeft: 30, paddingBottom: 40, paddingRight: 30)
     }
     
+    
     func configureButton() {
         switch tournamentType {
         case .create:
@@ -108,21 +109,20 @@ class TournamentBuilderVC: UIViewController, UIPickerViewDelegate, UIPickerViewD
     @objc func presentNextVC() {
         switch tournamentType {
         case .create:
-            userSelection()
+            chooseOpponents()
         case .join:
-            searchForTourny()
+            searchForTournyAndEnterLobby()
         default:
             return
         }
     }
     
-    func userSelection() {
-        viewModel!.presentUserSelectionVC()
+    func chooseOpponents() {
+        presenter!.fetchCurrentUserData()
     }
     
-    func searchForTourny() {
-        guard let currentUser = viewModel!.currentUser else { return }
-        Service.shared.findPublicTournament(tournySize: viewModel!.tournySize, currentUser: currentUser, view: self)
+    func searchForTournyAndEnterLobby() {
+        presenter!.searchForTournyAndEnterLobby()
     }
     
     
@@ -132,25 +132,25 @@ class TournamentBuilderVC: UIViewController, UIPickerViewDelegate, UIPickerViewD
     
     func pickerView(_ pickerView: UIPickerView, numberOfRowsInComponent component: Int) -> Int {
         if pickerView == sizePicker {
-            return viewModel!.sizeOptions.count
+            return presenter!.sizeOptions.count
         } else {
-            return viewModel!.buyInOptions.count
+            return presenter!.buyInOptions.count
         }
     }
     
     func pickerView(_ pickerView: UIPickerView, titleForRow row: Int, forComponent component: Int) -> String? {
         if pickerView == sizePicker {
-            let row = String(viewModel!.sizeOptions[row])
+            let row = String(presenter!.sizeOptions[row])
             return row
         } else {
-            let row = viewModel!.buyInOptions[row]
+            let row = presenter!.buyInOptions[row]
             return row
         }
         
     }
     
     func pickerView(_ pickerView: UIPickerView, didSelectRow row: Int, inComponent component: Int) {
-        viewModel!.tournySize = viewModel!.sizeOptions[row]
+        presenter!.tournySize = presenter!.sizeOptions[row]
     }
     
     required init?(coder aDecoder: NSCoder) {

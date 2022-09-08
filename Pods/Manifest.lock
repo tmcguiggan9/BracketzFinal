@@ -52,6 +52,15 @@ PODS:
     - GeoFire/Utils (= 4.1.0)
   - GeoFire/Utils (4.1.0):
     - Firebase/Database (~> 6.0)
+  - Google/Analytics (2.0.4):
+    - Google/Core
+    - GoogleAnalytics (~> 3.12)
+  - Google/Core (2.0.4):
+    - GoogleInterchangeUtilities (~> 1.0)
+    - GoogleNetworkingUtilities (~> 1.0)
+    - GoogleSymbolUtilities (~> 1.0)
+    - GoogleUtilities (~> 1.1)
+  - GoogleAnalytics (3.20.0)
   - GoogleAppMeasurement (6.9.0):
     - GoogleUtilities/AppDelegateSwizzler (~> 6.7)
     - GoogleUtilities/MethodSwizzler (~> 6.7)
@@ -60,6 +69,13 @@ PODS:
     - nanopb (~> 1.30906.0)
   - GoogleDataTransport (7.5.1):
     - nanopb (~> 1.30906.0)
+  - GoogleInterchangeUtilities (1.2.2):
+    - GoogleSymbolUtilities (~> 1.1)
+  - GoogleNetworkingUtilities (1.2.2):
+    - GoogleSymbolUtilities (~> 1.1)
+  - GoogleSymbolUtilities (1.1.2)
+  - GoogleUtilities (1.3.2):
+    - GoogleSymbolUtilities (~> 1.1)
   - GoogleUtilities/AppDelegateSwizzler (6.7.2):
     - GoogleUtilities/Environment
     - GoogleUtilities/Logger
@@ -94,6 +110,7 @@ DEPENDENCIES:
   - Firebase/Database
   - Firebase/Storage
   - GeoFire (>= 1.1)
+  - Google/Analytics
   - GoogleUtilities/Environment
 
 SPEC REPOS:
@@ -107,8 +124,13 @@ SPEC REPOS:
     - FirebaseInstallations
     - FirebaseStorage
     - GeoFire
+    - Google
+    - GoogleAnalytics
     - GoogleAppMeasurement
     - GoogleDataTransport
+    - GoogleInterchangeUtilities
+    - GoogleNetworkingUtilities
+    - GoogleSymbolUtilities
     - GoogleUtilities
     - GTMSessionFetcher
     - leveldb-library
@@ -125,14 +147,19 @@ SPEC CHECKSUMS:
   FirebaseInstallations: 466c7b4d1f58fe16707693091da253726a731ed2
   FirebaseStorage: 15e0f15ef3c7fec3d1899d68623e47d4447066b4
   GeoFire: 8372fdf980b5ef1df6767dba7ff79288fad34612
+  Google: d536877ec602555b755cc28ce6fed104825c693c
+  GoogleAnalytics: 01e4c5a04544a3608f93e970ce0817836897c5a5
   GoogleAppMeasurement: a6a3a066369828db64eda428cb2856dc1cdc7c4e
   GoogleDataTransport: f56af7caa4ed338dc8e138a5d7c5973e66440833
+  GoogleInterchangeUtilities: d5bc4d88d5b661ab72f9d70c58d02ca8c27ad1f7
+  GoogleNetworkingUtilities: 3edd3a8161347494f2da60ea0deddc8a472d94cb
+  GoogleSymbolUtilities: 631ee17048aa5e9ab133470d768ea997a5ef9b96
   GoogleUtilities: 7f2f5a07f888cdb145101d6042bc4422f57e70b3
   GTMSessionFetcher: b3503b20a988c4e20cc189aa798fd18220133f52
   leveldb-library: 55d93ee664b4007aac644a782d11da33fba316f7
   nanopb: 59317e09cf1f1a0af72f12af412d54edf52603fc
   PromisesObjC: 8c196f5a328c2cba3e74624585467a557dcb482f
 
-PODFILE CHECKSUM: a45ae68ed3ad7446fde6f9089622acb7da8d5dd4
+PODFILE CHECKSUM: de212b69a0d95c762ea5acb2d4548edb873db31e
 
 COCOAPODS: 1.10.0
