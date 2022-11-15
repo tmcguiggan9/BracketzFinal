@@ -16,7 +16,8 @@ class TournamentBuilderPresenter {
     var sizeOptions = [2, 4, 8, 16]
     var buyInOptions = ["$.25"]
     var view: TournamentBuilderVC
-    let currentUser = Auth.auth().currentUser
+    var currentUser: User?
+    
     
     
     init(_ view: TournamentBuilderVC) {
@@ -24,11 +25,17 @@ class TournamentBuilderPresenter {
     }
     
     func fetchCurrentUserData() {
-        guard let currentUser = currentUser else { return }
-        Service.shared.fetchUserData(uid: currentUser.uid) { (currentUserData) in
-            self.presentUserSelectionVC(currentUserData: currentUserData)
-            print("Debug: Current User is \(currentUserData)")
+        let currentUser = Auth.auth().currentUser
+        
+        if let currentUser = currentUser {
+            Service.shared.fetchUserData(uid: currentUser.uid) { (currentUserData) in
+                self.presentUserSelectionVC(currentUserData: currentUserData)
+                print("Debug: Current User is \(currentUserData)")
+            }
+        } else {
+            print("DEBUG: Could not collect current user data")
         }
+        
     }
     
     func presentUserSelectionVC(currentUserData: User) {
@@ -44,7 +51,10 @@ class TournamentBuilderPresenter {
     }
     
     func searchForTournyAndEnterLobby() {
-        guard let currentUserId = currentUser?.uid else {return}
-        Service.shared.findPublicTournament(tournySize: tournySize, currentUserId: currentUserId, view: view)
+        if let currentUser = currentUser {
+            Service.shared.findPublicTournament(tournySize: tournySize, currentUser: currentUser, view: view)
+        } else {
+            print("Could not fetch current user data")
+        }
     }
 }

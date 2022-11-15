@@ -32,7 +32,7 @@ class UserSelectionPresenter {
         guard tournyUsers.count == tournySize else {
             return
         }
-        Service.shared.sendInvitesAndCreateTournament(tournyUsers: tournyUsers, tournySize: tournySize, view: view)
+        Service.shared.sendInvitesAndCreateTournament(tournyUsers: tournyUsers, tournySize: tournySize, view: view, currentUser: currentUser)
     }
     
     func fetchUsers() {

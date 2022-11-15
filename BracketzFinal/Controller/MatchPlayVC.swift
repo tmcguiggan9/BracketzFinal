@@ -15,7 +15,7 @@ class MatchPlayVC: UIViewController {
     var user2 = String()
     var user1Move: String = ""
     var user2Move: String = ""
-    let currentUser = Auth.auth().currentUser?.uid
+    let currentUser: User
     private var users: [User]?
     private var tourny: Tournament?
     private var matchID: String?
@@ -96,7 +96,7 @@ class MatchPlayVC: UIViewController {
         view.backgroundColor = .white
         Service.shared.removeObserver(uid: self.tourny!.tournamentID)
         REF_TOURNAMENTS.child(tourny!.tournamentID).child("matches").removeAllObservers()
-        if currentUser == tourny?.tournamentUsers[0] {
+        if currentUser.uid == tourny!.tournamentUsers[0] {
             REF_TOURNAMENTS.child(tourny!.tournamentID).updateChildValues(["acceptedUsers": 0])
         }
         observeOpponentMove()
@@ -104,11 +104,12 @@ class MatchPlayVC: UIViewController {
     }
     
     
-    init(_ users: [User],_ tourny: Tournament,_ matchID: String,_ tournySize: Int) {
+    init(_ users: [User],_ tourny: Tournament,_ matchID: String,_ tournySize: Int,_ currentUser: User) {
         self.users = users
         self.tournySize = tournySize
         self.tourny = tourny
         self.matchID = matchID
+        self.currentUser = currentUser
         user1 = users[0].uid
         user2 = users[1].uid
         
@@ -123,7 +124,7 @@ class MatchPlayVC: UIViewController {
             return label
         }()
         
-        if currentUser == user1 {
+        if currentUser.uid == user1 {
             opponentNameLabel.text = "Opponent: \(users[1].username)"
         } else {
             opponentNameLabel.text = "Opponent: \(users[0].username)"
@@ -220,7 +221,7 @@ class MatchPlayVC: UIViewController {
                             value = []
                         }
                         
-                        if let index = value?.firstIndex(of: self.currentUser!) {
+                        if let index = value?.firstIndex(of: self.currentUser.uid) {
                             value?.remove(at: index)
                         }
                         currentData.value = value
@@ -228,12 +229,12 @@ class MatchPlayVC: UIViewController {
                     }
                     
                     
-                    REF_USERS.child(self.currentUser!).child("unresolvedTournaments").observeSingleEvent(of: .value) { (snapshot) in
+                    REF_USERS.child(self.currentUser.uid).child("unresolvedTournaments").observeSingleEvent(of: .value) { (snapshot) in
                         guard var invites = snapshot.value as? [String] else { return }
                         if let index = invites.firstIndex(of: self.tourny!.tournamentID) {
                             invites.remove(at: index)
                         }
-                        REF_USERS.child(self.currentUser!).updateChildValues(["unresolvedTournaments": invites])
+                        REF_USERS.child(self.currentUser.uid).updateChildValues(["unresolvedTournaments": invites])
                     }
     
                     let controller = LoserVC()
@@ -267,12 +268,12 @@ class MatchPlayVC: UIViewController {
         if newTournySize == 1 {
             
             REF_TOURNAMENTS.child(self.tourny!.tournamentID).removeValue()
-            REF_USERS.child(self.currentUser!).child("unresolvedTournaments").observeSingleEvent(of: .value) { (snapshot) in
+            REF_USERS.child(self.currentUser.uid).child("unresolvedTournaments").observeSingleEvent(of: .value) { (snapshot) in
                 guard var invites = snapshot.value as? [String] else { return }
                 if let index = invites.firstIndex(of: self.tourny!.tournamentID) {
                     invites.remove(at: index)
                 }
-                REF_USERS.child(self.currentUser!).updateChildValues(["unresolvedTournaments": invites])
+                REF_USERS.child(self.currentUser.uid).updateChildValues(["unresolvedTournaments": invites])
             }
             let controller = WinnerVC()
             navigationController?.pushViewController(controller, animated: true)
@@ -295,9 +296,8 @@ class MatchPlayVC: UIViewController {
                 
                 if users.count == newTournySize {
                     self.shouldPresentLoadingView(false)
-                    let controller = LobbyVC()
-                    controller.tourny = Tournament(self.tourny!.tournamentID, tournamentUsers: users, false)
-                    controller.tournySize = newTournySize
+                    let newTourny = Tournament(self.tourny!.tournamentID, tournamentUsers: users, false)
+                    let controller = LobbyVC(currentUser: self.currentUser, tournySize: newTournySize, tourny: newTourny)
                     self.navigationController?.popToRootViewController(animated: true)
                     self.navigationController?.pushViewController(controller, animated: true)
                 }
@@ -351,7 +351,7 @@ class MatchPlayVC: UIViewController {
     
     
     func observeOpponentMove() {
-        if user1 == currentUser {
+        if user1 == currentUser.uid {
             REF_TOURNAMENTS.child(tourny!.tournamentID).child("matches").child(matchID!).child("user2move").observe(.value) { (snapshot) in
                 guard let move = snapshot.value as? String else { return }
                 self.opponentMoveText = move
@@ -378,7 +378,7 @@ class MatchPlayVC: UIViewController {
         scissorsButton.backgroundColor = .white
         sender.backgroundColor = #colorLiteral(red: 0.4745098054, green: 0.8392156959, blue: 0.9764705896, alpha: 1)
         sender.setTitleColor(#colorLiteral(red: 0.4745098054, green: 0.8392156959, blue: 0.9764705896, alpha: 1), for: .normal)
-        if currentUser == user1 {
+        if currentUser.uid == user1 {
             REF_TOURNAMENTS.child(tourny!.tournamentID).child("matches").child(matchID!).updateChildValues(["user1move": sender.currentTitle!])
         } else {
             REF_TOURNAMENTS.child(tourny!.tournamentID).child("matches").child(matchID!).updateChildValues(["user2move": sender.currentTitle!])

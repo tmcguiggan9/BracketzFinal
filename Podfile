@@ -13,6 +13,5 @@ target 'BracketzFinal' do
     pod 'Firebase/Storage'
     pod 'GeoFire', '>= 1.1'
     pod 'GoogleUtilities/Environment'
-    pod 'Google/Analytics'
-
+    pod 'GoogleAnalytics'
 end

@@ -76,7 +76,7 @@ struct Service {
         REF_TOURNAMENTS.child(uid).child("acceptedUsers").removeAllObservers()
     }
     
-    func findPublicTournament(tournySize: Int, currentUserId: String, view: UIViewController) {
+    func findPublicTournament(tournySize: Int, currentUser: User, view: UIViewController) {
         var tournyUsers = [String]()
         REF_TOURNAMENTS.observeSingleEvent(of: .value) { (snapshot) in
             if let tournys = snapshot.value as? [String: Any] {
@@ -95,7 +95,7 @@ struct Service {
                             } else {
                                 tourny!["acceptedUsers"] = tourny!["acceptedUsers"] as! Int + 1
                                 tournyUsers = (tourny!["tournamentUsers"] as? [String])!
-                                tournyUsers.append(currentUserId)
+                                tournyUsers.append(currentUser.uid)
                                 tourny!["tournamentUsers"] = tournyUsers
                                 
                                 currentData.value = tourny
@@ -107,9 +107,8 @@ struct Service {
                                 if users.count == tournySize {
                                     view.shouldPresentLoadingView(false)
                                     DispatchQueue.main.async {
-                                        let controller = LobbyVC()
-                                        controller.tourny = Tournament(x.key, tournamentUsers: users, true)
-                                        controller.tournySize = tournySize
+                                        let newTourny = Tournament(x.key, tournamentUsers: users, true)
+                                        let controller = LobbyVC(currentUser: currentUser, tournySize: tournySize, tourny: newTourny)
                                         view.navigationController?.popToRootViewController(animated: true)
                                         view.navigationController?.pushViewController(controller, animated: true)
                                     }
@@ -122,7 +121,7 @@ struct Service {
                     }
                 }
             }
-            let values = ["tournamentUsers": [currentUserId], "acceptedUsers": 1, "isPublic": true, "tournySize": tournySize] as [String: Any]
+            let values = ["tournamentUsers": [currentUser.uid], "acceptedUsers": 1, "isPublic": true, "tournySize": tournySize] as [String: Any]
             REF_TOURNAMENTS.childByAutoId().updateChildValues(values) { (error, ref) in
                 
                 REF_TOURNAMENTS.child(ref.key!).child("tournamentUsers").observe(.value) { (snapshot) in
@@ -132,9 +131,8 @@ struct Service {
                         REF_TOURNAMENTS.child(ref.key!).updateChildValues(["isPublic": false])
                         view.shouldPresentLoadingView(false)
                         DispatchQueue.main.async {
-                            let controller = LobbyVC()
-                            controller.tourny = Tournament(ref.key!, tournamentUsers: users, true)
-                            controller.tournySize = tournySize
+                            let newTourny = Tournament(ref.key!, tournamentUsers: users, true)
+                            let controller = LobbyVC(currentUser: currentUser, tournySize: tournySize, tourny: newTourny)
                             view.navigationController?.popToRootViewController(animated: true)
                             view.navigationController?.pushViewController(controller, animated: true)
                         }
@@ -148,8 +146,7 @@ struct Service {
     }
     
     
-    func addUserToInviteList(invites: [String], row: Int, view: UIViewController) {
-        let controller = LobbyVC()
+    func addUserToInviteList(invites: [String], row: Int, view: UIViewController, currentUser: User) {
         
         REF_TOURNAMENTS.child(invites[row]).child("acceptedUsers").observeSingleEvent(of: .value) { (snapshot) in
             guard var presentUsers = snapshot.value as? Int else { return }
@@ -160,13 +157,15 @@ struct Service {
         
         REF_TOURNAMENTS.child(invites[row]).child("tournamentUsers").observeSingleEvent(of: .value) { (snapshot) in
             guard let users = snapshot.value as? [String] else { return }
-            controller.tourny = Tournament(invites[row], tournamentUsers: users, false)
-            controller.tournySize = users.count
+            let newTourny = Tournament(invites[row], tournamentUsers: users, false)
+            let controller = LobbyVC(currentUser: currentUser, tournySize: users.count, tourny: newTourny)
+            view.navigationController?.pushViewController(controller, animated: true)
         }
-        view.navigationController?.pushViewController(controller, animated: true)
     }
     
-    func sendInvitesAndCreateTournament(tournyUsers: [String], tournySize: Int, view: UIViewController) {
+    
+    
+    func sendInvitesAndCreateTournament(tournyUsers: [String], tournySize: Int, view: UIViewController, currentUser: User) {
         let values = ["tournamentUsers": tournyUsers, "acceptedUsers": 1, "isPublic": false] as [String: Any]
         REF_TOURNAMENTS.childByAutoId().updateChildValues(values) { (error, ref) in
             view.dismiss(animated: true, completion: nil)
@@ -183,10 +182,8 @@ struct Service {
             }
             
                 let newTourny = Tournament(ref.key!, tournamentUsers: tournyUsers, false)
-                let controller = LobbyVC()
-                controller.tourny = newTourny
-                controller.tournySize = tournySize
-                
+                let controller = LobbyVC(currentUser: currentUser, tournySize: tournySize, tourny: newTourny)
+            
                 view.navigationController?.pushViewController(controller, animated: true)
             }
     }

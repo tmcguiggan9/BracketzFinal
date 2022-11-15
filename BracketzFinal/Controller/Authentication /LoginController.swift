@@ -8,7 +8,13 @@
 import UIKit
 import Firebase
 
+protocol LoginControllerDelegate: AnyObject {
+    func setCurrentUser()
+}
+
 class LoginController: UIViewController {
+    
+    weak var delegate: LoginControllerDelegate?
     
     private let iconImage: UIImageView = {
         let iv = UIImageView()
@@ -79,7 +85,9 @@ class LoginController: UIViewController {
                 print("failed to log user in with error \(error.localizedDescription)")
                 return
             }
-            self.dismiss(animated: true, completion: nil)
+            self.dismiss(animated: true) {
+                self.delegate?.setCurrentUser()
+            }
         }
     }
     

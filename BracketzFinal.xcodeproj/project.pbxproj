@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		ACD958C2B5F64E23A9FDC7E0 /* Pods_BracketzFinal.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8453F0B931C1DEB103C6D57B /* Pods_BracketzFinal.framework */; };
 		BC09A7BF26724C5100AD4BE0 /* TabBarController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC09A7BE26724C5100AD4BE0 /* TabBarController.swift */; };
 		BC3966AF264DB0F00079137E /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = BC3966AE264DB0F00079137E /* GoogleService-Info.plist */; };
 		BC3966F1264DDECB0079137E /* User.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC3966F0264DDECB0079137E /* User.swift */; };
@@ -31,19 +32,18 @@
 		BCA22DBE263DB3F300D460EB /* Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCA22DBD263DB3F300D460EB /* Extensions.swift */; };
 		BCA22DC2263DB55800D460EB /* InputContainerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCA22DC1263DB55800D460EB /* InputContainerView.swift */; };
 		BCA22DC5263DB62600D460EB /* CustomTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCA22DC4263DB62600D460EB /* CustomTextField.swift */; };
+		BCB951D12919E79D00FA0D57 /* LobbyPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCB951D02919E79D00FA0D57 /* LobbyPresenter.swift */; };
 		BCBC5440266ECF2200B10616 /* SideMenuVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCBC543F266ECF2200B10616 /* SideMenuVC.swift */; };
 		BCBC5444266F29D400B10616 /* WinnerVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCBC5443266F29D400B10616 /* WinnerVC.swift */; };
 		BCBC5447266F2D6700B10616 /* LoserVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCBC5446266F2D6700B10616 /* LoserVC.swift */; };
 		BCCB8F302888AEE700702AE8 /* TournamentBuilderPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCCB8F2F2888AEE700702AE8 /* TournamentBuilderPresenter.swift */; };
 		BCCF097028A58AC300444603 /* UserSelectionPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCCF096F28A58AC300444603 /* UserSelectionPresenter.swift */; };
 		BCD79B67265BED8600656C10 /* MatchPlayVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCD79B66265BED8600656C10 /* MatchPlayVC.swift */; };
-		E7695096156670FBE2A753C7 /* Pods_BracketzFinal.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 512CEE89675D13137828DF71 /* Pods_BracketzFinal.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		17853165FE1A45F3978A8F75 /* Pods-BracketzFinal.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-BracketzFinal.release.xcconfig"; path = "Target Support Files/Pods-BracketzFinal/Pods-BracketzFinal.release.xcconfig"; sourceTree = "<group>"; };
-		512CEE89675D13137828DF71 /* Pods_BracketzFinal.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_BracketzFinal.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		AA15E00F549208114A9A5DCE /* Pods-BracketzFinal.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-BracketzFinal.debug.xcconfig"; path = "Target Support Files/Pods-BracketzFinal/Pods-BracketzFinal.debug.xcconfig"; sourceTree = "<group>"; };
+		4B1E51C8F41F53BC2FA5954C /* Pods-BracketzFinal.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-BracketzFinal.debug.xcconfig"; path = "Target Support Files/Pods-BracketzFinal/Pods-BracketzFinal.debug.xcconfig"; sourceTree = "<group>"; };
+		8453F0B931C1DEB103C6D57B /* Pods_BracketzFinal.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_BracketzFinal.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		BC09A7BE26724C5100AD4BE0 /* TabBarController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabBarController.swift; sourceTree = "<group>"; };
 		BC3966AE264DB0F00079137E /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		BC3966F0264DDECB0079137E /* User.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = User.swift; sourceTree = "<group>"; };
@@ -70,12 +70,14 @@
 		BCA22DBD263DB3F300D460EB /* Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Extensions.swift; sourceTree = "<group>"; };
 		BCA22DC1263DB55800D460EB /* InputContainerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InputContainerView.swift; sourceTree = "<group>"; };
 		BCA22DC4263DB62600D460EB /* CustomTextField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomTextField.swift; sourceTree = "<group>"; };
+		BCB951D02919E79D00FA0D57 /* LobbyPresenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LobbyPresenter.swift; sourceTree = "<group>"; };
 		BCBC543F266ECF2200B10616 /* SideMenuVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SideMenuVC.swift; sourceTree = "<group>"; };
 		BCBC5443266F29D400B10616 /* WinnerVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WinnerVC.swift; sourceTree = "<group>"; };
 		BCBC5446266F2D6700B10616 /* LoserVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoserVC.swift; sourceTree = "<group>"; };
 		BCCB8F2F2888AEE700702AE8 /* TournamentBuilderPresenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TournamentBuilderPresenter.swift; sourceTree = "<group>"; };
 		BCCF096F28A58AC300444603 /* UserSelectionPresenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserSelectionPresenter.swift; sourceTree = "<group>"; };
 		BCD79B66265BED8600656C10 /* MatchPlayVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatchPlayVC.swift; sourceTree = "<group>"; };
+		DAEF414104B8E245EF1245BC /* Pods-BracketzFinal.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-BracketzFinal.release.xcconfig"; path = "Target Support Files/Pods-BracketzFinal/Pods-BracketzFinal.release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -83,7 +85,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				E7695096156670FBE2A753C7 /* Pods_BracketzFinal.framework in Frameworks */,
+				ACD958C2B5F64E23A9FDC7E0 /* Pods_BracketzFinal.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -93,18 +95,10 @@
 		1CF3D2EEB6D91A42B0B0881B /* Pods */ = {
 			isa = PBXGroup;
 			children = (
-				AA15E00F549208114A9A5DCE /* Pods-BracketzFinal.debug.xcconfig */,
-				17853165FE1A45F3978A8F75 /* Pods-BracketzFinal.release.xcconfig */,
+				4B1E51C8F41F53BC2FA5954C /* Pods-BracketzFinal.debug.xcconfig */,
+				DAEF414104B8E245EF1245BC /* Pods-BracketzFinal.release.xcconfig */,
 			);
 			path = Pods;
-			sourceTree = "<group>";
-		};
-		8FA67B8464A65FC82A45EAE1 /* Frameworks */ = {
-			isa = PBXGroup;
-			children = (
-				512CEE89675D13137828DF71 /* Pods_BracketzFinal.framework */,
-			);
-			name = Frameworks;
 			sourceTree = "<group>";
 		};
 		BC4CE9EF264ED1A200298C29 /* Authentication  */ = {
@@ -122,7 +116,7 @@
 				BC5EB4DF263DAD83006B9EE0 /* BracketzFinal */,
 				BC5EB4DE263DAD83006B9EE0 /* Products */,
 				1CF3D2EEB6D91A42B0B0881B /* Pods */,
-				8FA67B8464A65FC82A45EAE1 /* Frameworks */,
+				E3E055EDB32EBF5639F43618 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -215,8 +209,17 @@
 				BCCB8F2F2888AEE700702AE8 /* TournamentBuilderPresenter.swift */,
 				BCCF096F28A58AC300444603 /* UserSelectionPresenter.swift */,
 				BC9C2FFE28C77D690098AE1C /* InvitesPresenter.swift */,
+				BCB951D02919E79D00FA0D57 /* LobbyPresenter.swift */,
 			);
 			path = Presenters;
+			sourceTree = "<group>";
+		};
+		E3E055EDB32EBF5639F43618 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				8453F0B931C1DEB103C6D57B /* Pods_BracketzFinal.framework */,
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -226,11 +229,11 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = BC5EB4F1263DAD84006B9EE0 /* Build configuration list for PBXNativeTarget "BracketzFinal" */;
 			buildPhases = (
-				20E4CF13ED10975B3E8DD0BF /* [CP] Check Pods Manifest.lock */,
+				18470782007137D21CB6774E /* [CP] Check Pods Manifest.lock */,
 				BC5EB4D9263DAD83006B9EE0 /* Sources */,
 				BC5EB4DA263DAD83006B9EE0 /* Frameworks */,
 				BC5EB4DB263DAD83006B9EE0 /* Resources */,
-				C9A1FBBCF4EF3EF1758465A8 /* [CP] Embed Pods Frameworks */,
+				55F62571513E7401B0D0B534 /* [CP] Embed Pods Frameworks */,
 			);
 			buildRules = (
 			);
@@ -248,7 +251,7 @@
 			isa = PBXProject;
 			attributes = {
 				LastSwiftUpdateCheck = 1240;
-				LastUpgradeCheck = 1240;
+				LastUpgradeCheck = 1340;
 				TargetAttributes = {
 					BC5EB4DC263DAD83006B9EE0 = {
 						CreatedOnToolsVersion = 12.4;
@@ -288,7 +291,7 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		20E4CF13ED10975B3E8DD0BF /* [CP] Check Pods Manifest.lock */ = {
+		18470782007137D21CB6774E /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -310,7 +313,7 @@
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
-		C9A1FBBCF4EF3EF1758465A8 /* [CP] Embed Pods Frameworks */ = {
+		55F62571513E7401B0D0B534 /* [CP] Embed Pods Frameworks */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -350,6 +353,7 @@
 				BCD79B67265BED8600656C10 /* MatchPlayVC.swift in Sources */,
 				BC4CE9F1264ED21B00298C29 /* PlayerView.swift in Sources */,
 				BC4CE9FC265440DC00298C29 /* LobbyVC.swift in Sources */,
+				BCB951D12919E79D00FA0D57 /* LobbyPresenter.swift in Sources */,
 				BC3966F7264DDF070079137E /* Tournament.swift in Sources */,
 				BCA22DC5263DB62600D460EB /* CustomTextField.swift in Sources */,
 				BC9C300128CA20E90098AE1C /* MoveButton.swift in Sources */,
@@ -503,10 +507,11 @@
 		};
 		BC5EB4F2263DAD84006B9EE0 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = AA15E00F549208114A9A5DCE /* Pods-BracketzFinal.debug.xcconfig */;
+			baseConfigurationReference = 4B1E51C8F41F53BC2FA5954C /* Pods-BracketzFinal.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 6P7J87MYM2;
 				INFOPLIST_FILE = BracketzFinal/Info.plist;
@@ -527,10 +532,11 @@
 		};
 		BC5EB4F3263DAD84006B9EE0 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 17853165FE1A45F3978A8F75 /* Pods-BracketzFinal.release.xcconfig */;
+			baseConfigurationReference = DAEF414104B8E245EF1245BC /* Pods-BracketzFinal.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 6P7J87MYM2;
 				INFOPLIST_FILE = BracketzFinal/Info.plist;
