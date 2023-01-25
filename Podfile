@@ -7,10 +7,10 @@ target 'BracketzFinal' do
 
   # Pods for BracketzFinal
 
-    pod 'Firebase/Core'
-    pod 'Firebase/Database'
-    pod 'Firebase/Auth'
-    pod 'Firebase/Storage'
+    pod 'FirebaseCore'
+    pod 'FirebaseDatabase'
+    pod 'FirebaseAuth'
+    pod 'FirebaseStorage'
     pod 'GeoFire', '>= 1.1'
     pod 'GoogleUtilities/Environment'
     pod 'GoogleAnalytics'
