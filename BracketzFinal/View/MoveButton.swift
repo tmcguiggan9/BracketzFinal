@@ -20,7 +20,7 @@ class MoveButton: UIButton {
         imageEdgeInsets = UIEdgeInsets(top: 12,left: 20,bottom: 12,right: 20)
         layer.borderWidth = 3
         layer.borderColor = #colorLiteral(red: 0, green: 0, blue: 0, alpha: 1)
-        setTitle("rock", for: .normal)
+        setTitle(move, for: .normal)
     }
     
     required init?(coder: NSCoder) {

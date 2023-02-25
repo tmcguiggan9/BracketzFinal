@@ -30,9 +30,10 @@ class InvitesPresenter {
     }
     
     func acceptInvite(indexPath: IndexPath) {
-        view.navigationController?.popViewController(animated: true)
-        if let invites = invites {
-            Service.shared.addUserToInviteList(invites: invites, row: indexPath.row, view: view, currentUser: currentUser)
+        view.dismiss(animated: true) {
+            if let invites = self.invites {
+                Service.shared.addUserToInviteList(invites: invites, row: indexPath.row, view: self.view, currentUser: self.currentUser)
+            }
         }
     }
     

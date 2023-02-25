@@ -13,21 +13,21 @@ import Firebase
 class LobbyVC: UIViewController, UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
     
     var presenter: LobbyPresenter?
-
-
+    var currentUser: User
+    var tournySize: Int
+    var tourny: Tournament
     var presentUsers = Int()
-    
     var waitingOn = Int()
     let isPublic = false
     
     
     init(currentUser: User, tournySize: Int, tourny: Tournament) {
+        self.currentUser = currentUser
+        self.tournySize = tournySize
+        self.tourny = tourny
         super.init(nibName: nil, bundle: nil)
-        presenter = LobbyPresenter(self, currentUser: currentUser, tournySize: tournySize, tourny: tourny)
     }
     
-    
-     
     private let collectionView: UICollectionView = {
         let viewLayout = UICollectionViewFlowLayout()
         let collectionView = UICollectionView(frame: .zero, collectionViewLayout: viewLayout)
@@ -63,6 +63,7 @@ class LobbyVC: UIViewController, UICollectionViewDelegate, UICollectionViewDataS
         collectionView.delegate = self
         collectionView.dataSource = self
         collectionView.register(PlayerCollectionCell.self, forCellWithReuseIdentifier: "PlayerCollectionCell")
+        presenter = LobbyPresenter(self, currentUser: currentUser, tournySize: tournySize, tourny: tourny)
         
     }
     
@@ -82,53 +83,6 @@ class LobbyVC: UIViewController, UICollectionViewDelegate, UICollectionViewDataS
         presenter?.checkIfCurrentUserIsHost()
     }
     
-    
-    func configureTournament() {
-        if presenter!.count == 1 {
-            for x in 0..<presenter!.users!.count {
-                if x%2 == 0 {
-                    var matchUsers = [User]()
-                    var usernames = [String]()
-                    matchUsers.append(presenter!.users![x])
-                    matchUsers.append(presenter!.users![x+1])
-                    usernames.append(presenter!.users![x].uid)
-                    usernames.append(presenter!.users![x+1].uid)
-                    presenter!.tournyUserIDs.append(presenter!.users![x].uid)
-                    presenter!.tournyUserIDs.append(presenter!.users![x+1].uid)
-                    
-                    let values = ["users": usernames] as [String: Any]
-                    REF_TOURNAMENTS.child(presenter!.tourny!.tournamentID).child("matches").childByAutoId().updateChildValues(values)
-                }
-            }
-            observeMatches()
-            presenter!.count += 1
-        }
-    }
-    
-    func setMatch() {
-    }
-    
-    
-    func observeMatches() {
-        Service.shared.observeMatches(uid: presenter!.tourny!.tournamentID) { (matches) in
-            if matches.count == self.presenter!.tournySize/2 {
-                self.presenter!.matchesArray = matches
-            }
-        }
-    }
-    
-    
-    func fetchUsers() {
-        var array = [User]()
-        for x in presenter!.tourny!.tournamentUsers {
-            Service.shared.fetchUserData(uid: x) { (user) in
-                array.append(user)
-                self.presenter!.users = array
-            }
-        }
-    }
-    
-    
     func configureUI() {
         configureNavigationBar(withTitle: "Lobby", prefersLargeTitles: false)
         
@@ -137,21 +91,17 @@ class LobbyVC: UIViewController, UICollectionViewDelegate, UICollectionViewDataS
         
         view.addSubview(collectionView)
         collectionView.anchor(top: view.safeAreaLayoutGuide.topAnchor, left: view.leftAnchor, bottom: waitingOnLabel.topAnchor, right: view.rightAnchor, paddingTop: 8, paddingLeft: 8, paddingBottom: 8, paddingRight: 8)
-        
     }
-    
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return presenter!.users!.count
     }
-    
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "PlayerCollectionCell", for: indexPath) as! PlayerCollectionCell
         cell.user = presenter!.users![indexPath.row]
         return cell
     }
-    
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAt section: Int) -> UIEdgeInsets {
         return .init(top: 16, left: 0, bottom: 16, right: 0)
