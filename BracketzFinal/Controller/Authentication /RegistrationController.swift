@@ -59,7 +59,7 @@ class RegistrationController: UIViewController {
         button.setTitleColor(.white, for: .normal)
         button.isEnabled = true
         button.setHeight(height: 50)
-        button.addTarget(self, action: #selector(handleRegistration), for: .touchUpInside)
+        button.addTarget(RegistrationController.self, action: #selector(handleRegistration), for: .touchUpInside)
         return button
     }()
     
@@ -70,7 +70,7 @@ class RegistrationController: UIViewController {
         attributedTitle.append(NSMutableAttributedString(string: "Log In", attributes: [.font: UIFont.boldSystemFont(ofSize: 16), .foregroundColor: UIColor.white]))
         
         button.setAttributedTitle(attributedTitle, for: .normal)
-        button.addTarget(self, action: #selector(handleShowLogin), for: .touchUpInside)
+        button.addTarget(RegistrationController.self, action: #selector(handleShowLogin), for: .touchUpInside)
         return button
     }()
     

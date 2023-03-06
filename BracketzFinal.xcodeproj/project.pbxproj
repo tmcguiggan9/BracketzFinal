@@ -13,6 +13,7 @@
 		BC3966F1264DDECB0079137E /* User.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC3966F0264DDECB0079137E /* User.swift */; };
 		BC3966F4264DDEFF0079137E /* Match.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC3966F3264DDEFF0079137E /* Match.swift */; };
 		BC3966F7264DDF070079137E /* Tournament.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC3966F6264DDF070079137E /* Tournament.swift */; };
+		BC3E248D29B6776B001CBFC5 /* MatchPlayPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC3E248C29B6776B001CBFC5 /* MatchPlayPresenter.swift */; };
 		BC4CE9EB264EC70700298C29 /* UserSelectionVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC4CE9EA264EC70700298C29 /* UserSelectionVC.swift */; };
 		BC4CE9F1264ED21B00298C29 /* PlayerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC4CE9F0264ED21B00298C29 /* PlayerView.swift */; };
 		BC4CE9F52652D24A00298C29 /* Service.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC4CE9F42652D24A00298C29 /* Service.swift */; };
@@ -49,6 +50,7 @@
 		BC3966F0264DDECB0079137E /* User.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = User.swift; sourceTree = "<group>"; };
 		BC3966F3264DDEFF0079137E /* Match.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Match.swift; sourceTree = "<group>"; };
 		BC3966F6264DDF070079137E /* Tournament.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tournament.swift; sourceTree = "<group>"; };
+		BC3E248C29B6776B001CBFC5 /* MatchPlayPresenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatchPlayPresenter.swift; sourceTree = "<group>"; };
 		BC4CE9EA264EC70700298C29 /* UserSelectionVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserSelectionVC.swift; sourceTree = "<group>"; };
 		BC4CE9F0264ED21B00298C29 /* PlayerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayerView.swift; sourceTree = "<group>"; };
 		BC4CE9F42652D24A00298C29 /* Service.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Service.swift; sourceTree = "<group>"; };
@@ -210,6 +212,7 @@
 				BCCF096F28A58AC300444603 /* UserSelectionPresenter.swift */,
 				BC9C2FFE28C77D690098AE1C /* InvitesPresenter.swift */,
 				BCB951D02919E79D00FA0D57 /* LobbyPresenter.swift */,
+				BC3E248C29B6776B001CBFC5 /* MatchPlayPresenter.swift */,
 			);
 			path = Presenters;
 			sourceTree = "<group>";
@@ -351,6 +354,7 @@
 				BC3966F4264DDEFF0079137E /* Match.swift in Sources */,
 				BCA22DB8263DB33B00D460EB /* LoginController.swift in Sources */,
 				BCD79B67265BED8600656C10 /* MatchPlayVC.swift in Sources */,
+				BC3E248D29B6776B001CBFC5 /* MatchPlayPresenter.swift in Sources */,
 				BC4CE9F1264ED21B00298C29 /* PlayerView.swift in Sources */,
 				BC4CE9FC265440DC00298C29 /* LobbyVC.swift in Sources */,
 				BCB951D12919E79D00FA0D57 /* LobbyPresenter.swift in Sources */,

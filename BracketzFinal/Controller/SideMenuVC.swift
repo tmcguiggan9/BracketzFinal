@@ -24,7 +24,7 @@ class SideMenuVC: UIViewController {
         button.setTitleColor(.white, for: .normal)
         button.setHeight(height: 50)
         button.isEnabled = true
-        button.addTarget(self, action: #selector(handleLogout), for: .touchUpInside)
+        button.addTarget(SideMenuVC.self, action: #selector(handleLogout), for: .touchUpInside)
         return button
     }()
     
