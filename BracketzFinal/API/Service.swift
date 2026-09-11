@@ -46,12 +46,15 @@ struct Service {
         }
     }
     
-    func fetchInvites(uid: String, completion: @escaping([String]) -> Void) {
-        REF_USERS.child(uid).child("unresolvedTournaments").observe( .value) { (snapshot) in
-            guard let invites = snapshot.value as? [String] else { return }
-    
-            completion(invites)
+    @discardableResult
+    func observeInvites(uid: String, completion: @escaping ([String]) -> Void) -> DatabaseHandle {
+        REF_USERS.child(uid).child("unresolvedTournaments").observe(.value) { snapshot in
+            completion(snapshot.value as? [String] ?? [])
         }
+    }
+
+    func stopObservingInvites(uid: String, handle: DatabaseHandle) {
+        REF_USERS.child(uid).child("unresolvedTournaments").removeObserver(withHandle: handle)
     }
     
     func observePresentUsers(uid: String, completion: @escaping(Int) -> Void) {
@@ -100,6 +103,8 @@ struct Service {
 
                             if !users.contains(currentUser.uid) {
                                 users.append(currentUser.uid)
+                                let acceptedUserIDs = Self.stringArray(tourny["acceptedUserIDs"]) ?? []
+                                tourny["acceptedUserIDs"] = acceptedUserIDs + [currentUser.uid]
                                 tourny["acceptedUsers"] = acceptedUsers + 1
                                 tourny["tournamentUsers"] = users
                                 currentData.value = tourny
@@ -124,7 +129,7 @@ struct Service {
                         return
                 }
             }
-            let values = ["tournamentUsers": [currentUser.uid], "acceptedUsers": 1, "isPublic": true, "tournySize": tournySize] as [String: Any]
+            let values = ["tournamentUsers": [currentUser.uid], "acceptedUserIDs": [currentUser.uid], "acceptedUsers": 1, "isPublic": true, "tournySize": tournySize] as [String: Any]
             REF_TOURNAMENTS.childByAutoId().updateChildValues(values) { (error, ref) in
                 guard error == nil, let tournamentID = ref.key else {
                     view.shouldPresentLoadingView(false)
@@ -153,27 +158,53 @@ struct Service {
     }
     
     
-    func addUserToInviteList(invites: [String], row: Int, view: UIViewController, currentUser: User) {
-        
-        REF_TOURNAMENTS.child(invites[row]).child("acceptedUsers").observeSingleEvent(of: .value) { (snapshot) in
-            guard var presentUsers = snapshot.value as? Int else { return }
-            presentUsers += 1
-            REF_TOURNAMENTS.child(invites[row]).updateChildValues(["acceptedUsers": presentUsers])
+    func acceptInvite(tournamentID: String, currentUser: User, completion: @escaping (Tournament?) -> Void) {
+        let tournamentReference = REF_TOURNAMENTS.child(tournamentID)
+
+        tournamentReference.runTransactionBlock { currentData -> TransactionResult in
+            guard var tournament = currentData.value as? [String: Any],
+                  let tournamentUsers = Self.stringArray(tournament["tournamentUsers"]),
+                  let acceptedUserIDs = InvitationRules.acceptedUserIDs(
+                    existing: Self.stringArray(tournament["acceptedUserIDs"]),
+                    tournamentUsers: tournamentUsers,
+                    acceptingUserID: currentUser.uid
+                  ) else {
+                return TransactionResult.abort()
+            }
+
+            tournament["acceptedUserIDs"] = acceptedUserIDs
+            tournament["acceptedUsers"] = max(Self.intValue(tournament["acceptedUsers"]) ?? 0, acceptedUserIDs.count)
+            currentData.value = tournament
+            return TransactionResult.success(withValue: currentData)
+        } andCompletionBlock: { error, committed, snapshot in
+            guard error == nil,
+                  committed,
+                  let tournament = snapshot?.value as? [String: Any],
+                  let users = Self.stringArray(tournament["tournamentUsers"]) else {
+                completion(nil)
+                return
+            }
+
+            self.removeInvite(tournamentID: tournamentID, uid: currentUser.uid) {
+                completion(Tournament(tournamentID, tournamentUsers: users, false))
+            }
         }
-        
-        
-        REF_TOURNAMENTS.child(invites[row]).child("tournamentUsers").observeSingleEvent(of: .value) { (snapshot) in
-            guard let users = snapshot.value as? [String] else { return }
-            let newTourny = Tournament(invites[row], tournamentUsers: users, false)
-            let controller = LobbyVC(currentUser: currentUser, tournySize: users.count, tourny: newTourny)
-            view.navigationController?.pushViewController(controller, animated: true)
+    }
+
+    func removeInvite(tournamentID: String, uid: String, completion: (() -> Void)? = nil) {
+        REF_USERS.child(uid).child("unresolvedTournaments").runTransactionBlock { currentData -> TransactionResult in
+            let invites = currentData.value as? [String] ?? []
+            currentData.value = InvitationRules.removingInvite(tournamentID, from: invites)
+            return TransactionResult.success(withValue: currentData)
+        } andCompletionBlock: { _, _, _ in
+            completion?()
         }
     }
     
     
     
     func sendInvitesAndCreateTournament(tournyUsers: [String], tournySize: Int, view: UIViewController, currentUser: User) {
-        let values = ["tournamentUsers": tournyUsers, "acceptedUsers": 1, "isPublic": false, "tournySize": tournySize] as [String: Any]
+        let values = ["tournamentUsers": tournyUsers, "acceptedUserIDs": [currentUser.uid], "acceptedUsers": 1, "isPublic": false, "tournySize": tournySize] as [String: Any]
         REF_TOURNAMENTS.childByAutoId().updateChildValues(values) { (error, ref) in
             guard error == nil, let tournamentID = ref.key else {
                 view.shouldPresentLoadingView(false)
@@ -209,5 +240,11 @@ struct Service {
     private static func boolValue(_ value: Any?) -> Bool {
         if let value = value as? Bool { return value }
         return (value as? NSNumber)?.boolValue ?? false
+    }
+
+    private static func stringArray(_ value: Any?) -> [String]? {
+        if let value = value as? [String] { return value }
+        if let value = value as? [Any] { return value.compactMap { $0 as? String } }
+        return nil
     }
 }

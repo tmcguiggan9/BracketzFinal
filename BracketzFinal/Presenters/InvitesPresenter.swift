@@ -6,10 +6,12 @@
 //
 
 import Foundation
+import FirebaseDatabase
 
 class InvitesPresenter {
-    var view: InvitesVC
-    var currentUser: User
+    unowned let view: InvitesVC
+    let currentUser: User
+    private var invitesHandle: DatabaseHandle?
     
     var invites: [String]? {
         didSet {
@@ -23,25 +25,45 @@ class InvitesPresenter {
     }
     
     func fetchInvites() {
+        stop()
         let uid = currentUser.uid
-        Service.shared.fetchInvites(uid: uid) { (invites) in
-            self.invites = invites
+        invitesHandle = Service.shared.observeInvites(uid: uid) { [weak self] invites in
+            self?.invites = invites
         }
     }
     
     func acceptInvite(indexPath: IndexPath) {
+        guard let tournamentID = invites?[safe: indexPath.row] else { return }
+        let navigationController = view.navigationController
+        let currentUser = currentUser
+
         view.dismiss(animated: true) {
-            if let invites = self.invites {
-                Service.shared.addUserToInviteList(invites: invites, row: indexPath.row, view: self.view, currentUser: self.currentUser)
+            Service.shared.acceptInvite(tournamentID: tournamentID, currentUser: currentUser) { tournament in
+                guard let tournament else { return }
+                let controller = LobbyVC(currentUser: currentUser, tournySize: tournament.tournamentUsers.count, tourny: tournament)
+                navigationController?.pushViewController(controller, animated: true)
             }
         }
     }
     
     func deleteInvite(indexPath: IndexPath) {
-        let uid = currentUser.uid
-        REF_TOURNAMENTS.child(invites![indexPath.row]).removeValue()
-        invites?.remove(at: indexPath.row)
-        REF_USERS.child(uid).updateChildValues(["unresolvedTournaments": invites!])
-        view.tableView.reloadData()
+        guard let tournamentID = invites?[safe: indexPath.row] else { return }
+        Service.shared.removeInvite(tournamentID: tournamentID, uid: currentUser.uid)
+    }
+
+    func stop() {
+        guard let invitesHandle else { return }
+        Service.shared.stopObservingInvites(uid: currentUser.uid, handle: invitesHandle)
+        self.invitesHandle = nil
+    }
+
+    deinit {
+        stop()
+    }
+}
+
+private extension Array {
+    subscript(safe index: Index) -> Element? {
+        indices.contains(index) ? self[index] : nil
     }
 }

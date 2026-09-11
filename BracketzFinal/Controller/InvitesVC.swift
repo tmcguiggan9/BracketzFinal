@@ -25,6 +25,11 @@ class InvitesVC: UITableViewController {
         tableView.register(UITableViewCell.self, forCellReuseIdentifier: "Invite Cell")
         fetchInvites()
     }
+
+    override func viewDidDisappear(_ animated: Bool) {
+        super.viewDidDisappear(animated)
+        presenter?.stop()
+    }
     
     
     func fetchInvites() {
@@ -34,16 +39,13 @@ class InvitesVC: UITableViewController {
     
     
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        while presenter!.invites == nil {
-            return 0
-        }
-        return presenter!.invites!.count
+        presenter?.invites?.count ?? 0
     }
     
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "Invite Cell", for: indexPath)
-        cell.textLabel?.text = presenter!.invites![indexPath.row]
+        cell.textLabel?.text = presenter?.invites?[indexPath.row]
         return cell
     }
     
