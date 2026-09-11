@@ -93,12 +93,12 @@ class LobbyVC: UIViewController, UICollectionViewDelegate, UICollectionViewDataS
     }
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return presenter!.users!.count
+        return presenter?.users.count ?? 0
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "PlayerCollectionCell", for: indexPath) as! PlayerCollectionCell
-        cell.user = presenter!.users![indexPath.row]
+        cell.user = presenter?.users[indexPath.row]
         return cell
     }
     
@@ -109,7 +109,7 @@ class LobbyVC: UIViewController, UICollectionViewDelegate, UICollectionViewDataS
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         let frame = CGRect(x: 0, y: 0, width: view.frame.width - 50, height: 70)
         let estimatedSizeCell = PlayerCollectionCell(frame: frame)
-        estimatedSizeCell.user = presenter!.users![indexPath.row]
+        estimatedSizeCell.user = presenter?.users[indexPath.row]
         estimatedSizeCell.layoutIfNeeded()
         
         let targetSize = CGSize(width: view.frame.width - 50, height: 70)

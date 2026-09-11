@@ -10,21 +10,25 @@ import FirebaseDatabase
 
 class MatchPlayPresenter {
     
-    var tournySize = Int()
-    var user1 = String()
-    var user2 = String()
-    var view: MatchPlayVC
-    var timer = Timer()
+    let tournySize: Int
+    let user1: String
+    let user2: String
+    unowned let view: MatchPlayVC
+    private var timer: Timer?
+    private var opponentMoveReference: DatabaseReference?
+    private var opponentMoveHandle: DatabaseHandle?
+    private var tournamentUsersReference: DatabaseReference?
+    private var tournamentUsersHandle: DatabaseHandle?
     var timerCount = 10
     var didWin = false
     var didTie = false
     var didLose = false
     var user1Move: String = ""
     var user2Move: String = ""
-    var users: [User]?
+    let users: [User]
     var tourny: Tournament
-    var currentUser: User
-    var matchID: String?
+    let currentUser: User
+    let matchID: String
     
     init(_ view: MatchPlayVC, tournySize: Int, users: [User], tourny: Tournament, currentUser: User, matchID: String) {
         self.view = view
@@ -33,33 +37,33 @@ class MatchPlayPresenter {
         self.tourny = tourny
         self.currentUser = currentUser
         self.matchID = matchID
-        user1 = users[0].uid
-        user2 = users[1].uid
+        user1 = users.first?.uid ?? ""
+        user2 = users.dropFirst().first?.uid ?? ""
     }
     
     func startMatch() {
-        timer = Timer.scheduledTimer(timeInterval: 1.0, target: self, selector: #selector(timerAction), userInfo: nil, repeats: true)
+        timer?.invalidate()
+        timer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { [weak self] _ in
+            self?.timerAction()
+        }
     }
     
     func updateUserMoves(currentTitle: String) {
         if currentUser.uid == user1 {
-            REF_TOURNAMENTS.child(tourny.tournamentID).child("matches").child(matchID!).updateChildValues(["user1move": currentTitle])
+            REF_TOURNAMENTS.child(tourny.tournamentID).child("matches").child(matchID).updateChildValues(["user1move": currentTitle])
         } else {
-            REF_TOURNAMENTS.child(tourny.tournamentID).child("matches").child(matchID!).updateChildValues(["user2move": currentTitle])
+            REF_TOURNAMENTS.child(tourny.tournamentID).child("matches").child(matchID).updateChildValues(["user2move": currentTitle])
         }
     }
     
     func observeOpponentMove() {
-        if user1 == currentUser.uid {
-            REF_TOURNAMENTS.child(tourny.tournamentID).child("matches").child(matchID!).child("user2move").observe(.value) { (snapshot) in
+        stopObservingOpponentMove()
+        let moveKey = user1 == currentUser.uid ? "user2move" : "user1move"
+        let reference = REF_TOURNAMENTS.child(tourny.tournamentID).child("matches").child(matchID).child(moveKey)
+        opponentMoveReference = reference
+        opponentMoveHandle = reference.observe(.value) { [weak self] snapshot in
                 guard let move = snapshot.value as? String else { return }
-                self.view.opponentMoveText = move
-            }
-        } else {
-            REF_TOURNAMENTS.child(tourny.tournamentID).child("matches").child(matchID!).child("user1move").observe(.value) { (snapshot) in
-                guard let move = snapshot.value as? String else { return }
-                self.view.opponentMoveText = move
-            }
+                self?.view.opponentMoveText = move
         }
     }
     
@@ -97,25 +101,22 @@ class MatchPlayPresenter {
         }
         
         if timerCount == -7 {
-            timer.invalidate()
+            timer?.invalidate()
             checkWinLogic()
             
-            DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) { [weak self] in
+                guard let self else { return }
                 if self.didWin {
                     self.observeTournament()
                 } else if self.didLose {
                     
-                    REF_TOURNAMENTS.child(self.tourny.tournamentID).child("matches").child(self.matchID!).removeValue()
+                    REF_TOURNAMENTS.child(self.tourny.tournamentID).child("matches").child(self.matchID).removeValue()
                     
                     REF_TOURNAMENTS.child(self.tourny.tournamentID).child("tournamentUsers").runTransactionBlock { (currentData: MutableData) -> TransactionResult in
-                        var value = currentData.value as? [String]
-                        
-                        if value == nil {
-                            value = []
-                        }
-                        
-                        if let index = value?.firstIndex(of: self.currentUser.uid) {
-                            value?.remove(at: index)
+                        var value = currentData.value as? [String] ?? []
+
+                        if let index = value.firstIndex(of: self.currentUser.uid) {
+                            value.remove(at: index)
                         }
                         currentData.value = value
                         return TransactionResult.success(withValue: currentData)
@@ -155,21 +156,21 @@ class MatchPlayPresenter {
             
         } else {
             view.shouldPresentLoadingView(true, message: "Waiting for other matches to end...")
-            REF_TOURNAMENTS.child(self.tourny.tournamentID).child("acceptedUsers").runTransactionBlock { (currentData: MutableData) -> TransactionResult in
-                var value = currentData.value as? Int
-                
-                if value == nil {
-                    value = 0
-                }
-                
-                currentData.value = value! + 1
+            REF_TOURNAMENTS.child(self.tourny.tournamentID).child("acceptedUsers").runTransactionBlock { currentData -> TransactionResult in
+                let value = (currentData.value as? NSNumber)?.intValue ?? 0
+                currentData.value = value + 1
                 return TransactionResult.success(withValue: currentData)
             }
             
-            REF_TOURNAMENTS.child(tourny.tournamentID).child("tournamentUsers").observe(.value) { (snapshot) in
+            stopObservingTournamentUsers()
+            let reference = REF_TOURNAMENTS.child(tourny.tournamentID).child("tournamentUsers")
+            tournamentUsersReference = reference
+            tournamentUsersHandle = reference.observe(.value) { [weak self] snapshot in
+                guard let self else { return }
                 guard let users = snapshot.value as? [String] else { return }
                 
                 if users.count == newTournySize {
+                    self.stopObservingTournamentUsers()
                     self.view.shouldPresentLoadingView(false)
                     let newTourny = Tournament(self.tourny.tournamentID, tournamentUsers: users, false)
                     let controller = LobbyVC(currentUser: self.currentUser, tournySize: newTournySize, tourny: newTourny)
@@ -199,50 +200,49 @@ class MatchPlayPresenter {
         view.timerLabel.isHidden = false
         self.startMatch()
     }
+
+    func stop() {
+        timer?.invalidate()
+        timer = nil
+        stopObservingOpponentMove()
+        stopObservingTournamentUsers()
+    }
+
+    private func stopObservingOpponentMove() {
+        if let handle = opponentMoveHandle {
+            opponentMoveReference?.removeObserver(withHandle: handle)
+        }
+        opponentMoveHandle = nil
+        opponentMoveReference = nil
+    }
+
+    private func stopObservingTournamentUsers() {
+        if let handle = tournamentUsersHandle {
+            tournamentUsersReference?.removeObserver(withHandle: handle)
+        }
+        tournamentUsersHandle = nil
+        tournamentUsersReference = nil
+    }
+
+    deinit {
+        stop()
+    }
     
     func checkWinLogic() {
-        if view.myMoveText == "rock" {
-            if view.opponentMoveText == "rock"  {
-                view.rpsLabel.text = "TIE"
-                didTie = true
-            }
-            if view.opponentMoveText == "paper" {
-                view.rpsLabel.text = "YOU LOSE!"
-                didLose = true
-            }
-            if view.opponentMoveText == "scissors" || view.opponentMoveText == ""{
-                view.rpsLabel.text = "YOU WIN"
-                didWin = true
-            }
-        } else if view.myMoveText == "paper" {
-            if view.opponentMoveText == "rock" || view.opponentMoveText == ""{
-                view.rpsLabel.text = "YOU WIN!"
-                didWin = true
-            }
-            if view.opponentMoveText == "paper" {
-                view.rpsLabel.text = "TIE"
-                didTie = true
-            }
-            if view.opponentMoveText == "scissors" {
-                view.rpsLabel.text = "YOU LOSE"
-                didLose = true
-            }
-        } else if view.myMoveText == "scissors" {
-            if view.opponentMoveText == "rock" {
-                view.rpsLabel.text = "YOU LOSE!"
-                didLose = true
-            }
-            if view.opponentMoveText == "paper" || view.opponentMoveText == ""{
-                view.rpsLabel.text = "YOU WIN!"
-                didWin = true
-            }
-            if view.opponentMoveText == "scissors" {
-                view.rpsLabel.text = "TIE"
-                didTie = true
-            }
-        } else {
+        didWin = false
+        didTie = false
+        didLose = false
+
+        switch GameRules.outcome(myMove: view.myMoveText, opponentMove: view.opponentMoveText) {
+        case .win:
+            view.rpsLabel.text = "YOU WIN!"
+            didWin = true
+        case .loss:
             view.rpsLabel.text = "YOU LOSE!"
             didLose = true
+        case .tie:
+            view.rpsLabel.text = "TIE"
+            didTie = true
         }
     }
 }

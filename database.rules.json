@@ -42,6 +42,12 @@
         "acceptedUsers": {
           ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 16"
         },
+        "acceptedUserIDs": {
+          ".validate": "newData.hasChildren()",
+          "$index": {
+            ".validate": "newData.isString() && newData.val().length > 0 && newData.val().length <= 128"
+          }
+        },
         "isPublic": {
           ".validate": "newData.isBoolean()"
         },
@@ -70,6 +76,14 @@
         "$other": {
           ".validate": false
         }
+      }
+    },
+
+    "matchmaking": {
+      ".read": "auth != null",
+      ".write": "auth != null",
+      "$size": {
+        ".validate": "($size === '2' || $size === '4' || $size === '8' || $size === '16') && (newData.isString() || !newData.exists())"
       }
     }
   }

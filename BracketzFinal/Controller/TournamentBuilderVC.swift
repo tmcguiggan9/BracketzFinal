@@ -72,6 +72,11 @@ class TournamentBuilderVC: UIViewController, UIPickerViewDelegate, UIPickerViewD
         configureNavigationBar(withTitle: "BRACKETZ", prefersLargeTitles: false)
         presenter = TournamentBuilderPresenter(self)
     }
+
+    override func viewDidDisappear(_ animated: Bool) {
+        super.viewDidDisappear(animated)
+        presenter?.stopMatchmaking()
+    }
     
     func configureUI() {
         view.backgroundColor = .white
@@ -117,11 +122,11 @@ class TournamentBuilderVC: UIViewController, UIPickerViewDelegate, UIPickerViewD
     }
     
     func chooseOpponents() {
-        presenter!.fetchCurrentUserData()
+        presenter?.fetchCurrentUserData()
     }
     
     func searchForTournyAndEnterLobby() {
-        presenter!.searchForTournyAndEnterLobby()
+        presenter?.searchForTournyAndEnterLobby()
     }
     
     

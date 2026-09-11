@@ -11,7 +11,7 @@ class MatchPlayVC: UIViewController {
     
     var presenter: MatchPlayPresenter?
     let currentUser: User
-    private var tourny: Tournament?
+    private let tourny: Tournament
     var opponentMoveText: String = ""
     var myMoveText: String = ""
     var loser = String()
@@ -82,13 +82,18 @@ class MatchPlayVC: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .white
-        Service.shared.removeObserver(uid: self.tourny!.tournamentID)
-        REF_TOURNAMENTS.child(tourny!.tournamentID).child("matches").removeAllObservers()
-        if currentUser.uid == tourny!.tournamentUsers[0] {
-            REF_TOURNAMENTS.child(tourny!.tournamentID).updateChildValues(["acceptedUsers": 0])
+        Service.shared.removeObserver(uid: tourny.tournamentID)
+        REF_TOURNAMENTS.child(tourny.tournamentID).child("matches").removeAllObservers()
+        if currentUser.uid == tourny.tournamentUsers.first {
+            REF_TOURNAMENTS.child(tourny.tournamentID).updateChildValues(["acceptedUsers": 0])
         }
-        presenter!.observeOpponentMove()
+        presenter?.observeOpponentMove()
         startMatch()
+    }
+
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        presenter?.stop()
     }
     
     init(_ users: [User],_ tourny: Tournament,_ matchID: String,_ tournySize: Int,_ currentUser: User) {
@@ -100,8 +105,9 @@ class MatchPlayVC: UIViewController {
     }
     
     func configureOpponentLabel() {
-        if let users = presenter!.users {
-            if currentUser.uid == presenter!.user1 {
+        if let presenter, presenter.users.count >= 2 {
+            let users = presenter.users
+            if currentUser.uid == presenter.user1 {
                 opponentNameLabel.text = "Opponent: \(users[1].username)"
             } else {
                 opponentNameLabel.text = "Opponent: \(users[0].username)"
@@ -140,12 +146,12 @@ class MatchPlayVC: UIViewController {
     
     func startMatch() {
         rpsLabel.text = "SELECT YOUR MOVE"
-        presenter!.startMatch()
+        presenter?.startMatch()
     }
     
     @objc func moveSelected(_ sender: UIButton) {
-        myMoveText = sender.currentTitle!
-        print(sender.currentTitle!)
+        guard let currentTitle = sender.currentTitle else { return }
+        myMoveText = currentTitle
         rockButton.setTitleColor(#colorLiteral(red: 1, green: 1, blue: 1, alpha: 1), for: .normal)
         paperButton.setTitleColor(#colorLiteral(red: 1, green: 1, blue: 1, alpha: 1), for: .normal)
         scissorsButton.setTitleColor(#colorLiteral(red: 1, green: 1, blue: 1, alpha: 1), for: .normal)
@@ -154,8 +160,6 @@ class MatchPlayVC: UIViewController {
         scissorsButton.backgroundColor = .white
         sender.backgroundColor = #colorLiteral(red: 0.4745098054, green: 0.8392156959, blue: 0.9764705896, alpha: 1)
         sender.setTitleColor(#colorLiteral(red: 0.4745098054, green: 0.8392156959, blue: 0.9764705896, alpha: 1), for: .normal)
-        if let currentTitle = sender.currentTitle {
-            presenter!.updateUserMoves(currentTitle: currentTitle)
-        }
+        presenter?.updateUserMoves(currentTitle: currentTitle)
     }
 }
