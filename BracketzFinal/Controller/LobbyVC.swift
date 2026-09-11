@@ -65,6 +65,11 @@ class LobbyVC: UIViewController, UICollectionViewDelegate, UICollectionViewDataS
         presenter = LobbyPresenter(self, currentUser: currentUser, tournySize: tournySize, tourny: tourny)
         
     }
+
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        presenter?.stop()
+    }
     
     func reloadData() {
         collectionView.reloadData()
@@ -76,10 +81,6 @@ class LobbyVC: UIViewController, UICollectionViewDelegate, UICollectionViewDataS
     
     func observeTournament() {
         presenter?.observeTournament()
-    }
-    
-    func checkIfCurrentUserIsHost() {
-        presenter?.checkIfCurrentUserIsHost()
     }
     
     func configureUI() {

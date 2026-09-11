@@ -68,6 +68,10 @@ class TabBarController: UITabBarController, UITabBarControllerDelegate, SideMenu
         
         if let user = user {
             Service.shared.fetchUserData(uid: user.uid) { (currentUserData) in
+                guard let currentUserData else {
+                    self.presentError("Unable to load your profile. Please try again.")
+                    return
+                }
                 self.currentUser = currentUserData
                 print("Debug: Current User is \(currentUserData)")
             }

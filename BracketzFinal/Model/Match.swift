@@ -6,3 +6,8 @@
 //
 
 import Foundation
+
+struct TournamentMatch: Equatable {
+    let matchID: String
+    let userIDs: [String]
+}

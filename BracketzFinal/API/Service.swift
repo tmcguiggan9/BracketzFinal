@@ -29,9 +29,12 @@ struct Service {
     static let shared = Service()
     
     
-    func fetchUserData(uid: String, completion: @escaping(User) -> Void) {
+    func fetchUserData(uid: String, completion: @escaping (User?) -> Void) {
         REF_USERS.child(uid).observeSingleEvent(of: .value) { (snapshot) in
-            guard let dictionary = snapshot.value as? [String: Any] else { return }
+            guard let dictionary = snapshot.value as? [String: Any] else {
+                completion(nil)
+                return
+            }
             let uid = snapshot.key
             let user = User(uid: uid, dictionary: dictionary)
             
@@ -67,29 +70,47 @@ struct Service {
         REF_USERS.child(uid).child("unresolvedTournaments").removeObserver(withHandle: handle)
     }
     
-    func observePresentUsers(uid: String, completion: @escaping(Int) -> Void) {
-        REF_TOURNAMENTS.child(uid).child("acceptedUsers").observe(.value) { (snapshot) in
-            guard let presentUsers = snapshot.value as? Int else { return }
-            completion(presentUsers)
+    @discardableResult
+    func observePresentUsers(tournamentID: String, completion: @escaping (Int) -> Void) -> DatabaseHandle {
+        REF_TOURNAMENTS.child(tournamentID).child("acceptedUsers").observe(.value) { snapshot in
+            completion(Self.intValue(snapshot.value) ?? 0)
         }
     }
-    
-    func observeMatches(uid: String, completion: @escaping([String]) -> Void) {
-        
-        REF_TOURNAMENTS.child(uid).child("matches").observe(.value) { (snapshot) in
-            
-            guard let matches = snapshot.value as? [String: Any] else { return }
-            var finalMatches = [String]()
-            for x in matches {
-                finalMatches.append(x.key)
+
+    func stopObservingPresentUsers(tournamentID: String, handle: DatabaseHandle) {
+        REF_TOURNAMENTS.child(tournamentID).child("acceptedUsers").removeObserver(withHandle: handle)
+    }
+
+    @discardableResult
+    func observeMatches(tournamentID: String, completion: @escaping ([TournamentMatch]) -> Void) -> DatabaseHandle {
+        REF_TOURNAMENTS.child(tournamentID).child("matches").observe(.value) { snapshot in
+            completion(Self.tournamentMatches(from: snapshot.value))
+        }
+    }
+
+    func stopObservingMatches(tournamentID: String, handle: DatabaseHandle) {
+        REF_TOURNAMENTS.child(tournamentID).child("matches").removeObserver(withHandle: handle)
+    }
+
+    func configureRound(tournamentID: String, userIDs: [String], completion: @escaping (Bool) -> Void) {
+        guard let expectedMatches = BracketRules.matches(for: userIDs) else {
+            completion(false)
+            return
+        }
+
+        REF_TOURNAMENTS.child(tournamentID).child("matches").runTransactionBlock { currentData -> TransactionResult in
+            let existingMatches = Self.tournamentMatches(from: currentData.value)
+            if BracketRules.matchesAreComplete(existingMatches, expectedUserIDs: userIDs) {
+                return TransactionResult.success(withValue: currentData)
             }
-            completion(finalMatches)
+
+            currentData.value = Dictionary(uniqueKeysWithValues: expectedMatches.map { match in
+                (match.matchID, ["users": match.userIDs])
+            })
+            return TransactionResult.success(withValue: currentData)
+        } andCompletionBlock: { error, committed, _ in
+            completion(error == nil && committed)
         }
-    }
-    
-    func removeObserver(uid: String) {
-    
-        REF_TOURNAMENTS.child(uid).child("acceptedUsers").removeAllObservers()
     }
     
     func findOrCreatePublicTournament(
@@ -370,6 +391,19 @@ struct Service {
                 isPublic: boolValue(tournament["isPublic"]),
                 userIDs: users
             )
+        }
+    }
+
+    private static func tournamentMatches(from value: Any?) -> [TournamentMatch] {
+        guard let matches = value as? [String: Any] else { return [] }
+
+        return matches.compactMap { matchID, value in
+            guard let match = value as? [String: Any],
+                  let users = stringArray(match["users"]),
+                  users.count == 2 else {
+                return nil
+            }
+            return TournamentMatch(matchID: matchID, userIDs: users)
         }
     }
 }

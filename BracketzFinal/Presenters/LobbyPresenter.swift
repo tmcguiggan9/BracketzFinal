@@ -1,24 +1,24 @@
 //
-//  File.swift
+//  LobbyPresenter.swift
 //  BracketzFinal
-//
-//  Created by Edward McGuiggan on 11/7/22.
 //
 
 import Foundation
+import FirebaseDatabase
 
-
-class LobbyPresenter {
-    var view: LobbyVC
-    var currentUser: User
-    var tournySize: Int
+final class LobbyPresenter {
+    unowned let view: LobbyVC
+    let currentUser: User
+    let tournySize: Int
     let tournyBuyIn = 1
-    var tournyUserIDs = [String]()
-    var count = 1
     var tourny: Tournament
-    var matchesArray = [String]()
-    var users = [User]()
-    
+    private(set) var users = [User]()
+
+    private var presentUsersHandle: DatabaseHandle?
+    private var matchesHandle: DatabaseHandle?
+    private var didStartRound = false
+    private var didNavigateToMatch = false
+
     init(_ view: LobbyVC, currentUser: User, tournySize: Int, tourny: Tournament) {
         self.view = view
         self.currentUser = currentUser
@@ -26,100 +26,115 @@ class LobbyPresenter {
         self.tourny = tourny
         fetchUsers()
     }
-    
+
     func fetchUsers() {
-        var usersByID = [String: User]()
         let userIDs = tourny.tournamentUsers
+        guard userIDs.count == tournySize else {
+            view.presentError("This tournament has an invalid number of players.")
+            return
+        }
+
+        var usersByID = [String: User]()
+        var remainingFetches = userIDs.count
 
         for userID in userIDs {
-            Service.shared.fetchUserData(uid: userID) { user in
-                usersByID[userID] = user
+            Service.shared.fetchUserData(uid: userID) { [weak self] user in
+                guard let self else { return }
+                if let user {
+                    usersByID[userID] = user
+                }
+                remainingFetches -= 1
+                guard remainingFetches == 0 else { return }
 
-                guard usersByID.count == userIDs.count else { return }
                 self.users = userIDs.compactMap { usersByID[$0] }
+                guard self.users.count == userIDs.count else {
+                    self.view.presentError("One or more player profiles could not be loaded.")
+                    return
+                }
 
-                guard self.users.count == self.tournySize, self.count == 1 else { return }
                 self.view.reloadData()
                 self.view.configureUI()
                 self.observeTournament()
             }
         }
     }
-    
+
     func observeTournament() {
-        Service.shared.observePresentUsers(uid: tourny.tournamentID) { (presentUsers) in
-            self.view.waitingOnLabel.text = "waiting on \(self.tournySize - presentUsers) users"
-            if presentUsers == self.tournySize {
-                self.tourny.acceptedUsers = self.tournySize
-                self.view.dimBackground()
-                self.checkIfCurrentUserIsHost()
-            }
+        stopObservingPresentUsers()
+        presentUsersHandle = Service.shared.observePresentUsers(tournamentID: tourny.tournamentID) { [weak self] presentUsers in
+            guard let self else { return }
+            let waitingCount = max(self.tournySize - presentUsers, 0)
+            self.view.waitingOnLabel.text = "Waiting on \(waitingCount) users"
+
+            guard presentUsers >= self.tournySize else { return }
+            self.startRoundIfNeeded()
         }
     }
-    
-    func checkIfCurrentUserIsHost() {
-        guard let host = users.first else { return }
 
-        if currentUser.uid == host.uid {
-            configureTournament()
-        } else {
-            count += 1
-            tournyUserIDs = users.map(\.uid)
-            observeMatches()
+    func stop() {
+        stopObservingPresentUsers()
+        if let matchesHandle {
+            Service.shared.stopObservingMatches(tournamentID: tourny.tournamentID, handle: matchesHandle)
+        }
+        matchesHandle = nil
+    }
+
+    private func startRoundIfNeeded() {
+        guard !didStartRound else { return }
+        didStartRound = true
+        tourny.acceptedUsers = tournySize
+        view.dimBackground()
+        stopObservingPresentUsers()
+        observeMatches()
+
+        guard currentUser.uid == users.first?.uid else { return }
+        Service.shared.configureRound(tournamentID: tourny.tournamentID, userIDs: users.map(\.uid)) { [weak self] succeeded in
+            guard let self, !succeeded else { return }
+            self.view.presentError("The tournament round could not be created.")
         }
     }
-    
-    func configureTournament() {
-        
-            if count == 1, users.count == tournySize {
-                for x in 0..<users.count {
-                    if x%2 == 0 {
-                        let usernames = [users[x].uid, users[x + 1].uid]
-                        tournyUserIDs.append(contentsOf: usernames)
-                        
-                        let values = ["users": usernames] as [String: Any]
-                        REF_TOURNAMENTS.child(tourny.tournamentID).child("matches").childByAutoId().updateChildValues(values)
-                    }
-                }
-                observeMatches()
-                count += 1
+
+    private func observeMatches() {
+        guard matchesHandle == nil else { return }
+        matchesHandle = Service.shared.observeMatches(tournamentID: tourny.tournamentID) { [weak self] matches in
+            guard let self,
+                  BracketRules.matchesAreComplete(matches, expectedUserIDs: self.users.map(\.uid)),
+                  let match = BracketRules.match(for: self.currentUser.uid, in: matches) else {
+                return
             }
-    
-    }
-    
-    func observeMatches() {
-        Service.shared.observeMatches(uid: tourny.tournamentID) { (matches) in
-            if matches.count == self.tournySize/2 {
-                self.matchesArray = matches
-                self.setMatch()
-            }
+            self.enterMatch(match)
         }
     }
-    
-    func setMatch() {
-        let sortedMatches = matchesArray.sorted()
-        guard users.count == tournyUserIDs.count,
-              sortedMatches.count == tournySize / 2,
-              let playerIndex = tournyUserIDs.firstIndex(of: currentUser.uid) else { return }
 
-        let pairStartIndex = playerIndex - (playerIndex % 2)
-        guard users.indices.contains(pairStartIndex + 1),
-              sortedMatches.indices.contains(pairStartIndex / 2) else { return }
+    private func enterMatch(_ match: TournamentMatch) {
+        guard !didNavigateToMatch else { return }
+        let usersByID = Dictionary(uniqueKeysWithValues: users.map { ($0.uid, $0) })
+        let matchedUsers = match.userIDs.compactMap { usersByID[$0] }
+        guard matchedUsers.count == 2 else { return }
 
-        let finalUsers = [users[pairStartIndex], users[pairStartIndex + 1]]
-        let myMatchId = sortedMatches[pairStartIndex / 2]
-        
+        didNavigateToMatch = true
+        stop()
         view.waitingOnLabel.textColor = .green
         view.waitingOnLabel.text = "Pot: $\(tournyBuyIn)"
-        DispatchQueue.main.asyncAfter(deadline: .now() + 3.0) {
-            self.view.shouldPresentLoadingView(true, message: "Configuring round...")
-            
-            DispatchQueue.main.asyncAfter(deadline: .now() + 3.0) {
-                self.view.shouldPresentLoadingView(false)
-                let controller = MatchPlayVC(finalUsers, self.tourny, myMatchId, self.tournySize, self.currentUser)
-                self.view.navigationController?.popToRootViewController(animated: true)
-                self.view.navigationController?.pushViewController(controller, animated: true)
-            }
+        view.shouldPresentLoadingView(true, message: "Configuring round...")
+
+        DispatchQueue.main.async { [weak self] in
+            guard let self else { return }
+            self.view.shouldPresentLoadingView(false)
+            let controller = MatchPlayVC(matchedUsers, self.tourny, match.matchID, self.tournySize, self.currentUser)
+            self.view.navigationController?.popToRootViewController(animated: false)
+            self.view.navigationController?.pushViewController(controller, animated: true)
         }
+    }
+
+    private func stopObservingPresentUsers() {
+        if let presentUsersHandle {
+            Service.shared.stopObservingPresentUsers(tournamentID: tourny.tournamentID, handle: presentUsersHandle)
+        }
+        presentUsersHandle = nil
+    }
+
+    deinit {
+        stop()
     }
 }

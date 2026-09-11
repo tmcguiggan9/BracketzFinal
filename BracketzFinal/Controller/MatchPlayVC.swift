@@ -82,8 +82,6 @@ class MatchPlayVC: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .white
-        Service.shared.removeObserver(uid: tourny.tournamentID)
-        REF_TOURNAMENTS.child(tourny.tournamentID).child("matches").removeAllObservers()
         if currentUser.uid == tourny.tournamentUsers.first {
             REF_TOURNAMENTS.child(tourny.tournamentID).updateChildValues(["acceptedUsers": 0])
         }

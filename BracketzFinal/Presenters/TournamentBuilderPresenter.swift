@@ -31,6 +31,10 @@ class TournamentBuilderPresenter {
         
         if let currentUser = currentUser {
             Service.shared.fetchUserData(uid: currentUser.uid) { (currentUserData) in
+                guard let currentUserData else {
+                    self.view.presentError("Unable to load your profile. Please try again.")
+                    return
+                }
                 self.presentUserSelectionVC(currentUserData: currentUserData)
                 print("Debug: Current User is \(currentUserData)")
             }
@@ -65,6 +69,12 @@ class TournamentBuilderPresenter {
 
         Service.shared.fetchUserData(uid: authenticatedUser.uid) { [weak self] currentUser in
             guard let self else { return }
+            guard let currentUser else {
+                self.stopMatchmaking()
+                self.view.shouldPresentLoadingView(false)
+                self.view.presentError("Unable to load your profile. Please try again.")
+                return
+            }
             self.currentUser = currentUser
             self.beginMatchmaking(currentUser: currentUser)
         }
