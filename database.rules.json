@@ -68,6 +68,18 @@
             "user2move": {
               ".validate": "newData.isString() && (newData.val() === 'rock' || newData.val() === 'paper' || newData.val() === 'scissors')"
             },
+            "round": {
+              ".validate": "newData.isNumber() && newData.val() >= 1"
+            },
+            "status": {
+              ".validate": "newData.isString() && (newData.val() === 'waiting' || newData.val() === 'tie' || newData.val() === 'resolved')"
+            },
+            "winnerID": {
+              ".validate": "newData.isString() && newData.val().length > 0 && newData.val().length <= 128"
+            },
+            "loserID": {
+              ".validate": "newData.isString() && newData.val().length > 0 && newData.val().length <= 128"
+            },
             "$other": {
               ".validate": false
             }

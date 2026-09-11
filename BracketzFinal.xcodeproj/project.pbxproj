@@ -15,6 +15,7 @@
 		A20000000000000000000016 /* MatchmakingRulesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000017 /* MatchmakingRulesTests.swift */; };
 		A20000000000000000000018 /* BracketRules.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000019 /* BracketRules.swift */; };
 		A2000000000000000000001A /* BracketRulesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000000000000000000001B /* BracketRulesTests.swift */; };
+		A2000000000000000000001C /* MatchLifecycleRulesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000000000000000000001D /* MatchLifecycleRulesTests.swift */; };
 		A10000000000000000000001 /* FirebaseAuth in Frameworks */ = {isa = PBXBuildFile; productRef = A10000000000000000000011 /* FirebaseAuth */; };
 		A10000000000000000000002 /* FirebaseDatabase in Frameworks */ = {isa = PBXBuildFile; productRef = A10000000000000000000012 /* FirebaseDatabase */; };
 		BC09A7BF26724C5100AD4BE0 /* TabBarController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC09A7BE26724C5100AD4BE0 /* TabBarController.swift */; };
@@ -71,6 +72,7 @@
 		A20000000000000000000017 /* MatchmakingRulesTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatchmakingRulesTests.swift; sourceTree = "<group>"; };
 		A20000000000000000000019 /* BracketRules.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BracketRules.swift; sourceTree = "<group>"; };
 		A2000000000000000000001B /* BracketRulesTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BracketRulesTests.swift; sourceTree = "<group>"; };
+		A2000000000000000000001D /* MatchLifecycleRulesTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatchLifecycleRulesTests.swift; sourceTree = "<group>"; };
 		BC09A7BE26724C5100AD4BE0 /* TabBarController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabBarController.swift; sourceTree = "<group>"; };
 		BC3966AE264DB0F00079137E /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		BC3966F0264DDECB0079137E /* User.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = User.swift; sourceTree = "<group>"; };
@@ -252,6 +254,7 @@
 				A20000000000000000000013 /* InvitationRulesTests.swift */,
 				A20000000000000000000017 /* MatchmakingRulesTests.swift */,
 				A2000000000000000000001B /* BracketRulesTests.swift */,
+				A2000000000000000000001D /* MatchLifecycleRulesTests.swift */,
 			);
 			path = BracketzFinalTests;
 			sourceTree = "<group>";
@@ -368,6 +371,7 @@
 				A20000000000000000000012 /* InvitationRulesTests.swift in Sources */,
 				A20000000000000000000016 /* MatchmakingRulesTests.swift in Sources */,
 				A2000000000000000000001A /* BracketRulesTests.swift in Sources */,
+				A2000000000000000000001C /* MatchLifecycleRulesTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

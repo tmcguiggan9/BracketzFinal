@@ -100,13 +100,104 @@ struct Service {
 
         REF_TOURNAMENTS.child(tournamentID).child("matches").runTransactionBlock { currentData -> TransactionResult in
             let existingMatches = Self.tournamentMatches(from: currentData.value)
-            if BracketRules.matchesAreComplete(existingMatches, expectedUserIDs: userIDs) {
+            let existingValues = currentData.value as? [String: Any]
+            let hasLifecycleState = expectedMatches.allSatisfy { match in
+                guard let value = existingValues?[match.matchID] as? [String: Any] else { return false }
+                return Self.intValue(value["round"]) != nil && LiveMatchStatus(rawValue: value["status"] as? String ?? "") != nil
+            }
+            if BracketRules.matchesAreComplete(existingMatches, expectedUserIDs: userIDs), hasLifecycleState {
                 return TransactionResult.success(withValue: currentData)
             }
 
             currentData.value = Dictionary(uniqueKeysWithValues: expectedMatches.map { match in
-                (match.matchID, ["users": match.userIDs])
+                (match.matchID, ["users": match.userIDs, "round": 1, "status": LiveMatchStatus.waiting.rawValue] as [String: Any])
             })
+            return TransactionResult.success(withValue: currentData)
+        } andCompletionBlock: { error, committed, _ in
+            completion(error == nil && committed)
+        }
+    }
+
+    @discardableResult
+    func observeMatch(
+        tournamentID: String,
+        matchID: String,
+        completion: @escaping (LiveMatchState?) -> Void
+    ) -> DatabaseHandle {
+        REF_TOURNAMENTS.child(tournamentID).child("matches").child(matchID).observe(.value) { snapshot in
+            completion(Self.liveMatchState(matchID: matchID, value: snapshot.value))
+        }
+    }
+
+    func stopObservingMatch(tournamentID: String, matchID: String, handle: DatabaseHandle) {
+        REF_TOURNAMENTS.child(tournamentID).child("matches").child(matchID).removeObserver(withHandle: handle)
+    }
+
+    func submitMove(tournamentID: String, matchID: String, round: Int, userID: String, move: String) {
+        guard GameMove(userInput: move) != nil else { return }
+        REF_TOURNAMENTS.child(tournamentID).child("matches").child(matchID).runTransactionBlock { currentData -> TransactionResult in
+            guard var match = currentData.value as? [String: Any],
+                  Self.intValue(match["round"]) == round,
+                  match["status"] as? String == LiveMatchStatus.waiting.rawValue,
+                  let users = Self.stringArray(match["users"]),
+                  let playerIndex = users.firstIndex(of: userID) else {
+                return TransactionResult.abort()
+            }
+
+            match[playerIndex == 0 ? "user1move" : "user2move"] = move
+            currentData.value = match
+            return TransactionResult.success(withValue: currentData)
+        }
+    }
+
+    func resolveMatch(tournamentID: String, matchID: String, round: Int) {
+        REF_TOURNAMENTS.child(tournamentID).child("matches").child(matchID).runTransactionBlock { currentData -> TransactionResult in
+            guard var match = currentData.value as? [String: Any],
+                  Self.intValue(match["round"]) == round,
+                  match["status"] as? String == LiveMatchStatus.waiting.rawValue,
+                  let users = Self.stringArray(match["users"]),
+                  let resolution = MatchLifecycleRules.resolve(
+                    userIDs: users,
+                    user1Move: match["user1move"] as? String,
+                    user2Move: match["user2move"] as? String
+                  ) else {
+                return TransactionResult.abort()
+            }
+
+            match["status"] = resolution.status.rawValue
+            match["winnerID"] = resolution.winnerID
+            match["loserID"] = resolution.loserID
+            currentData.value = match
+            return TransactionResult.success(withValue: currentData)
+        }
+    }
+
+    func restartTiedMatch(tournamentID: String, matchID: String, round: Int) {
+        REF_TOURNAMENTS.child(tournamentID).child("matches").child(matchID).runTransactionBlock { currentData -> TransactionResult in
+            guard var match = currentData.value as? [String: Any],
+                  Self.intValue(match["round"]) == round,
+                  match["status"] as? String == LiveMatchStatus.tie.rawValue else {
+                return TransactionResult.abort()
+            }
+
+            match["round"] = round + 1
+            match["status"] = LiveMatchStatus.waiting.rawValue
+            match.removeValue(forKey: "user1move")
+            match.removeValue(forKey: "user2move")
+            match.removeValue(forKey: "winnerID")
+            match.removeValue(forKey: "loserID")
+            currentData.value = match
+            return TransactionResult.success(withValue: currentData)
+        }
+    }
+
+    func advanceWinner(tournamentID: String, winnerID: String, loserID: String, completion: @escaping (Bool) -> Void) {
+        REF_TOURNAMENTS.child(tournamentID).child("tournamentUsers").runTransactionBlock { currentData -> TransactionResult in
+            guard var users = Self.stringArray(currentData.value), users.contains(winnerID) else {
+                return TransactionResult.abort()
+            }
+            users.removeAll { $0 == loserID }
+            currentData.value = users
             return TransactionResult.success(withValue: currentData)
         } andCompletionBlock: { error, committed, _ in
             completion(error == nil && committed)
@@ -405,5 +496,27 @@ struct Service {
             }
             return TournamentMatch(matchID: matchID, userIDs: users)
         }
+    }
+
+    private static func liveMatchState(matchID: String, value: Any?) -> LiveMatchState? {
+        guard let match = value as? [String: Any],
+              let users = stringArray(match["users"]),
+              users.count == 2,
+              let round = intValue(match["round"]),
+              let statusValue = match["status"] as? String,
+              let status = LiveMatchStatus(rawValue: statusValue) else {
+            return nil
+        }
+
+        return LiveMatchState(
+            matchID: matchID,
+            userIDs: users,
+            round: round,
+            status: status,
+            user1Move: match["user1move"] as? String,
+            user2Move: match["user2move"] as? String,
+            winnerID: match["winnerID"] as? String,
+            loserID: match["loserID"] as? String
+        )
     }
 }
