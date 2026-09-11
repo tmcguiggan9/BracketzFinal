@@ -229,48 +229,20 @@ class MatchPlayPresenter {
     }
     
     func checkWinLogic() {
-        if view.myMoveText == "rock" {
-            if view.opponentMoveText == "rock"  {
-                view.rpsLabel.text = "TIE"
-                didTie = true
-            }
-            if view.opponentMoveText == "paper" {
-                view.rpsLabel.text = "YOU LOSE!"
-                didLose = true
-            }
-            if view.opponentMoveText == "scissors" || view.opponentMoveText == ""{
-                view.rpsLabel.text = "YOU WIN"
-                didWin = true
-            }
-        } else if view.myMoveText == "paper" {
-            if view.opponentMoveText == "rock" || view.opponentMoveText == ""{
-                view.rpsLabel.text = "YOU WIN!"
-                didWin = true
-            }
-            if view.opponentMoveText == "paper" {
-                view.rpsLabel.text = "TIE"
-                didTie = true
-            }
-            if view.opponentMoveText == "scissors" {
-                view.rpsLabel.text = "YOU LOSE"
-                didLose = true
-            }
-        } else if view.myMoveText == "scissors" {
-            if view.opponentMoveText == "rock" {
-                view.rpsLabel.text = "YOU LOSE!"
-                didLose = true
-            }
-            if view.opponentMoveText == "paper" || view.opponentMoveText == ""{
-                view.rpsLabel.text = "YOU WIN!"
-                didWin = true
-            }
-            if view.opponentMoveText == "scissors" {
-                view.rpsLabel.text = "TIE"
-                didTie = true
-            }
-        } else {
+        didWin = false
+        didTie = false
+        didLose = false
+
+        switch GameRules.outcome(myMove: view.myMoveText, opponentMove: view.opponentMoveText) {
+        case .win:
+            view.rpsLabel.text = "YOU WIN!"
+            didWin = true
+        case .loss:
             view.rpsLabel.text = "YOU LOSE!"
             didLose = true
+        case .tie:
+            view.rpsLabel.text = "TIE"
+            didTie = true
         }
     }
 }

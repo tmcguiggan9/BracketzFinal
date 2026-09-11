@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		A20000000000000000000002 /* GameRules.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000001 /* GameRules.swift */; };
+		A20000000000000000000005 /* GameRulesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000004 /* GameRulesTests.swift */; };
 		A10000000000000000000001 /* FirebaseAuth in Frameworks */ = {isa = PBXBuildFile; productRef = A10000000000000000000011 /* FirebaseAuth */; };
 		A10000000000000000000002 /* FirebaseDatabase in Frameworks */ = {isa = PBXBuildFile; productRef = A10000000000000000000012 /* FirebaseDatabase */; };
 		BC09A7BF26724C5100AD4BE0 /* TabBarController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC09A7BE26724C5100AD4BE0 /* TabBarController.swift */; };
@@ -43,7 +45,20 @@
 		BCD79B67265BED8600656C10 /* MatchPlayVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCD79B66265BED8600656C10 /* MatchPlayVC.swift */; };
 /* End PBXBuildFile section */
 
+/* Begin PBXContainerItemProxy section */
+		A2000000000000000000000B /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = BC5EB4D5263DAD83006B9EE0 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = BC5EB4DC263DAD83006B9EE0;
+			remoteInfo = BracketzFinal;
+		};
+/* End PBXContainerItemProxy section */
+
 /* Begin PBXFileReference section */
+		A20000000000000000000001 /* GameRules.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameRules.swift; sourceTree = "<group>"; };
+		A20000000000000000000004 /* GameRulesTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameRulesTests.swift; sourceTree = "<group>"; };
+		A20000000000000000000006 /* BracketzFinalTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = BracketzFinalTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		BC09A7BE26724C5100AD4BE0 /* TabBarController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabBarController.swift; sourceTree = "<group>"; };
 		BC3966AE264DB0F00079137E /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		BC3966F0264DDECB0079137E /* User.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = User.swift; sourceTree = "<group>"; };
@@ -81,6 +96,13 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		A20000000000000000000008 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		BC5EB4DA263DAD83006B9EE0 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -106,6 +128,7 @@
 			isa = PBXGroup;
 			children = (
 				BC5EB4DF263DAD83006B9EE0 /* BracketzFinal */,
+				A20000000000000000000003 /* BracketzFinalTests */,
 				BC5EB4DE263DAD83006B9EE0 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -114,6 +137,7 @@
 			isa = PBXGroup;
 			children = (
 				BC5EB4DD263DAD83006B9EE0 /* BracketzFinal.app */,
+				A20000000000000000000006 /* BracketzFinalTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -170,6 +194,7 @@
 		BC5EB4F7263DAE51006B9EE0 /* Model */ = {
 			isa = PBXGroup;
 			children = (
+				A20000000000000000000001 /* GameRules.swift */,
 				BC3966F0264DDECB0079137E /* User.swift */,
 				BC3966F3264DDEFF0079137E /* Match.swift */,
 				BC3966F6264DDF070079137E /* Tournament.swift */,
@@ -205,9 +230,35 @@
 			path = Presenters;
 			sourceTree = "<group>";
 		};
+		A20000000000000000000003 /* BracketzFinalTests */ = {
+			isa = PBXGroup;
+			children = (
+				A20000000000000000000004 /* GameRulesTests.swift */,
+			);
+			path = BracketzFinalTests;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		A2000000000000000000000A /* BracketzFinalTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = A2000000000000000000000F /* Build configuration list for PBXNativeTarget "BracketzFinalTests" */;
+			buildPhases = (
+				A20000000000000000000007 /* Sources */,
+				A20000000000000000000008 /* Frameworks */,
+				A20000000000000000000009 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				A2000000000000000000000C /* PBXTargetDependency */,
+			);
+			name = BracketzFinalTests;
+			productName = BracketzFinalTests;
+			productReference = A20000000000000000000006 /* BracketzFinalTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 		BC5EB4DC263DAD83006B9EE0 /* BracketzFinal */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = BC5EB4F1263DAD84006B9EE0 /* Build configuration list for PBXNativeTarget "BracketzFinal" */;
@@ -238,6 +289,10 @@
 				LastSwiftUpdateCheck = 1240;
 				LastUpgradeCheck = 1340;
 				TargetAttributes = {
+					A2000000000000000000000A = {
+						CreatedOnToolsVersion = 16.0;
+						TestTargetID = BC5EB4DC263DAD83006B9EE0;
+					};
 					BC5EB4DC263DAD83006B9EE0 = {
 						CreatedOnToolsVersion = 12.4;
 					};
@@ -260,11 +315,19 @@
 			projectRoot = "";
 			targets = (
 				BC5EB4DC263DAD83006B9EE0 /* BracketzFinal */,
+				A2000000000000000000000A /* BracketzFinalTests */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		A20000000000000000000009 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		BC5EB4DB263DAD83006B9EE0 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -279,10 +342,19 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		A20000000000000000000007 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A20000000000000000000005 /* GameRulesTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		BC5EB4D9263DAD83006B9EE0 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A20000000000000000000002 /* GameRules.swift in Sources */,
 				BCBC5447266F2D6700B10616 /* LoserVC.swift in Sources */,
 				BCA22DBE263DB3F300D460EB /* Extensions.swift in Sources */,
 				BC4CE9F52652D24A00298C29 /* Service.swift in Sources */,
@@ -316,6 +388,14 @@
 		};
 /* End PBXSourcesBuildPhase section */
 
+/* Begin PBXTargetDependency section */
+		A2000000000000000000000C /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = BC5EB4DC263DAD83006B9EE0 /* BracketzFinal */;
+			targetProxy = A2000000000000000000000B /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
 /* Begin PBXVariantGroup section */
 		BC5EB4E6263DAD83006B9EE0 /* Main.storyboard */ = {
 			isa = PBXVariantGroup;
@@ -336,6 +416,38 @@
 /* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
+		A2000000000000000000000D /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 6P7J87MYM2;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.tmcguiggan.BracketzFinalTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/BracketzFinal.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/BracketzFinal";
+			};
+			name = Debug;
+		};
+		A2000000000000000000000E /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 6P7J87MYM2;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.tmcguiggan.BracketzFinalTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/BracketzFinal.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/BracketzFinal";
+			};
+			name = Release;
+		};
 		BC5EB4EF263DAD84006B9EE0 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -503,6 +615,15 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		A2000000000000000000000F /* Build configuration list for PBXNativeTarget "BracketzFinalTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A2000000000000000000000D /* Debug */,
+				A2000000000000000000000E /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		BC5EB4D8263DAD83006B9EE0 /* Build configuration list for PBXProject "BracketzFinal" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
