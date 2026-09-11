@@ -11,6 +11,8 @@
 		A20000000000000000000005 /* GameRulesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000004 /* GameRulesTests.swift */; };
 		A20000000000000000000010 /* InvitationRules.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000011 /* InvitationRules.swift */; };
 		A20000000000000000000012 /* InvitationRulesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000013 /* InvitationRulesTests.swift */; };
+		A20000000000000000000014 /* MatchmakingRules.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000015 /* MatchmakingRules.swift */; };
+		A20000000000000000000016 /* MatchmakingRulesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000017 /* MatchmakingRulesTests.swift */; };
 		A10000000000000000000001 /* FirebaseAuth in Frameworks */ = {isa = PBXBuildFile; productRef = A10000000000000000000011 /* FirebaseAuth */; };
 		A10000000000000000000002 /* FirebaseDatabase in Frameworks */ = {isa = PBXBuildFile; productRef = A10000000000000000000012 /* FirebaseDatabase */; };
 		BC09A7BF26724C5100AD4BE0 /* TabBarController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC09A7BE26724C5100AD4BE0 /* TabBarController.swift */; };
@@ -63,6 +65,8 @@
 		A20000000000000000000006 /* BracketzFinalTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = BracketzFinalTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		A20000000000000000000011 /* InvitationRules.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InvitationRules.swift; sourceTree = "<group>"; };
 		A20000000000000000000013 /* InvitationRulesTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InvitationRulesTests.swift; sourceTree = "<group>"; };
+		A20000000000000000000015 /* MatchmakingRules.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatchmakingRules.swift; sourceTree = "<group>"; };
+		A20000000000000000000017 /* MatchmakingRulesTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatchmakingRulesTests.swift; sourceTree = "<group>"; };
 		BC09A7BE26724C5100AD4BE0 /* TabBarController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabBarController.swift; sourceTree = "<group>"; };
 		BC3966AE264DB0F00079137E /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		BC3966F0264DDECB0079137E /* User.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = User.swift; sourceTree = "<group>"; };
@@ -200,6 +204,7 @@
 			children = (
 				A20000000000000000000001 /* GameRules.swift */,
 				A20000000000000000000011 /* InvitationRules.swift */,
+				A20000000000000000000015 /* MatchmakingRules.swift */,
 				BC3966F0264DDECB0079137E /* User.swift */,
 				BC3966F3264DDEFF0079137E /* Match.swift */,
 				BC3966F6264DDF070079137E /* Tournament.swift */,
@@ -240,6 +245,7 @@
 			children = (
 				A20000000000000000000004 /* GameRulesTests.swift */,
 				A20000000000000000000013 /* InvitationRulesTests.swift */,
+				A20000000000000000000017 /* MatchmakingRulesTests.swift */,
 			);
 			path = BracketzFinalTests;
 			sourceTree = "<group>";
@@ -354,6 +360,7 @@
 			files = (
 				A20000000000000000000005 /* GameRulesTests.swift in Sources */,
 				A20000000000000000000012 /* InvitationRulesTests.swift in Sources */,
+				A20000000000000000000016 /* MatchmakingRulesTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -363,6 +370,7 @@
 			files = (
 				A20000000000000000000002 /* GameRules.swift in Sources */,
 				A20000000000000000000010 /* InvitationRules.swift in Sources */,
+				A20000000000000000000014 /* MatchmakingRules.swift in Sources */,
 				BCBC5447266F2D6700B10616 /* LoserVC.swift in Sources */,
 				BCA22DBE263DB3F300D460EB /* Extensions.swift in Sources */,
 				BC4CE9F52652D24A00298C29 /* Service.swift in Sources */,

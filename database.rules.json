@@ -77,6 +77,14 @@
           ".validate": false
         }
       }
+    },
+
+    "matchmaking": {
+      ".read": "auth != null",
+      ".write": "auth != null",
+      "$size": {
+        ".validate": "($size === '2' || $size === '4' || $size === '8' || $size === '16') && (newData.isString() || !newData.exists())"
+      }
     }
   }
 }

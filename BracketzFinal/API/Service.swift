@@ -13,6 +13,16 @@ let DB_REF = Database.database().reference()
 let REF_USERS = DB_REF.child("users")
 let REF_TOURNAMENTS = DB_REF.child("tournaments")
 let REF_MATCHES = DB_REF.child("matches")
+let REF_MATCHMAKING = DB_REF.child("matchmaking")
+
+struct MatchmakingSession {
+    let tournamentID: String
+    let userIDs: [String]
+}
+
+enum MatchmakingError: Error {
+    case unavailable
+}
 
 struct Service {
     
@@ -82,78 +92,174 @@ struct Service {
         REF_TOURNAMENTS.child(uid).child("acceptedUsers").removeAllObservers()
     }
     
-    func findPublicTournament(tournySize: Int, currentUser: User, view: UIViewController) {
-        var tournyUsers = [String]()
-        REF_TOURNAMENTS.observeSingleEvent(of: .value) { (snapshot) in
-            if let tournys = snapshot.value as? [String: Any] {
-                for x in tournys {
-                    guard let dictionary = x.value as? [String: Any],
-                          Self.boolValue(dictionary["isPublic"]),
-                          Self.intValue(dictionary["tournySize"]) == tournySize else {
-                        continue
-                    }
-                        
-                        REF_TOURNAMENTS.child(x.key).runTransactionBlock { (currentData: MutableData) -> TransactionResult in
-                            guard var tourny = currentData.value as? [String: Any],
-                                  let acceptedUsers = Self.intValue(tourny["acceptedUsers"]),
-                                  var users = tourny["tournamentUsers"] as? [String],
-                                  users.count < tournySize else {
-                                return TransactionResult.abort()
-                            }
+    func findOrCreatePublicTournament(
+        tournamentSize: Int,
+        userID: String,
+        completion: @escaping (Result<MatchmakingSession, MatchmakingError>) -> Void
+    ) {
+        REF_TOURNAMENTS.observeSingleEvent(of: .value) { snapshot in
+            let candidates = Self.matchmakingCandidates(from: snapshot)
+            let eligibleCandidates = MatchmakingRules.eligibleCandidates(
+                from: candidates,
+                tournamentSize: tournamentSize,
+                userID: userID
+            )
 
-                            if !users.contains(currentUser.uid) {
-                                users.append(currentUser.uid)
-                                let acceptedUserIDs = Self.stringArray(tourny["acceptedUserIDs"]) ?? []
-                                tourny["acceptedUserIDs"] = acceptedUserIDs + [currentUser.uid]
-                                tourny["acceptedUsers"] = acceptedUsers + 1
-                                tourny["tournamentUsers"] = users
-                                currentData.value = tourny
-                            }
-                            
-                            REF_TOURNAMENTS.child(x.key).child("tournamentUsers").observe(.value) { (snapshot) in
-                                guard let users = snapshot.value as? [String] else { return }
-                                
-                                if users.count == tournySize {
-                                    view.shouldPresentLoadingView(false)
-                                    DispatchQueue.main.async {
-                                        let newTourny = Tournament(x.key, tournamentUsers: users, true)
-                                        let controller = LobbyVC(currentUser: currentUser, tournySize: tournySize, tourny: newTourny)
-                                        view.navigationController?.popToRootViewController(animated: true)
-                                        view.navigationController?.pushViewController(controller, animated: true)
-                                    }
-                                }
-                                view.shouldPresentLoadingView(true, message: "Waiting for other users to join...")
-                            }
-                            return TransactionResult.success(withValue: currentData)
-                        }
-                        return
+            self.claimFirstAvailable(
+                eligibleCandidates.map(\.tournamentID),
+                tournamentSize: tournamentSize,
+                userID: userID
+            ) { session in
+                if let session {
+                    completion(.success(session))
+                } else {
+                    self.reserveAndClaimPublicTournament(
+                        tournamentSize: tournamentSize,
+                        userID: userID,
+                        completion: completion
+                    )
                 }
             }
-            let values = ["tournamentUsers": [currentUser.uid], "acceptedUserIDs": [currentUser.uid], "acceptedUsers": 1, "isPublic": true, "tournySize": tournySize] as [String: Any]
-            REF_TOURNAMENTS.childByAutoId().updateChildValues(values) { (error, ref) in
-                guard error == nil, let tournamentID = ref.key else {
-                    view.shouldPresentLoadingView(false)
+        }
+    }
+
+    @discardableResult
+    func observeTournamentUsers(tournamentID: String, completion: @escaping ([String]?) -> Void) -> DatabaseHandle {
+        REF_TOURNAMENTS.child(tournamentID).child("tournamentUsers").observe(.value) { snapshot in
+            completion(Self.stringArray(snapshot.value))
+        }
+    }
+
+    func stopObservingTournamentUsers(tournamentID: String, handle: DatabaseHandle) {
+        REF_TOURNAMENTS.child(tournamentID).child("tournamentUsers").removeObserver(withHandle: handle)
+    }
+
+    private func claimFirstAvailable(
+        _ tournamentIDs: [String],
+        tournamentSize: Int,
+        userID: String,
+        completion: @escaping (MatchmakingSession?) -> Void
+    ) {
+        guard let tournamentID = tournamentIDs.first else {
+            completion(nil)
+            return
+        }
+
+        claimPublicTournament(tournamentID: tournamentID, tournamentSize: tournamentSize, userID: userID) { session in
+            if let session {
+                completion(session)
+            } else {
+                self.claimFirstAvailable(
+                    Array(tournamentIDs.dropFirst()),
+                    tournamentSize: tournamentSize,
+                    userID: userID,
+                    completion: completion
+                )
+            }
+        }
+    }
+
+    private func reserveAndClaimPublicTournament(
+        tournamentSize: Int,
+        userID: String,
+        attemptsRemaining: Int = 2,
+        completion: @escaping (Result<MatchmakingSession, MatchmakingError>) -> Void
+    ) {
+        guard attemptsRemaining > 0 else {
+            completion(.failure(.unavailable))
+            return
+        }
+
+        guard let proposedID = REF_TOURNAMENTS.childByAutoId().key else {
+            completion(.failure(.unavailable))
+            return
+        }
+
+        let reservation = REF_MATCHMAKING.child(String(tournamentSize))
+        reservation.runTransactionBlock { currentData -> TransactionResult in
+            if currentData.value == nil || currentData.value is NSNull {
+                currentData.value = proposedID
+            }
+            return TransactionResult.success(withValue: currentData)
+        } andCompletionBlock: { error, committed, snapshot in
+            guard error == nil, committed, let tournamentID = snapshot?.value as? String else {
+                completion(.failure(.unavailable))
+                return
+            }
+
+            self.claimPublicTournament(
+                tournamentID: tournamentID,
+                tournamentSize: tournamentSize,
+                userID: userID,
+                createIfMissing: true
+            ) { session in
+                if let session {
+                    completion(.success(session))
                     return
                 }
-                
-                REF_TOURNAMENTS.child(tournamentID).child("tournamentUsers").observe(.value) { (snapshot) in
-                    guard let users = snapshot.value as? [String] else { return }
-                    
-                    if users.count == tournySize {
-                        REF_TOURNAMENTS.child(tournamentID).updateChildValues(["isPublic": false])
-                        view.shouldPresentLoadingView(false)
-                        DispatchQueue.main.async {
-                            let newTourny = Tournament(tournamentID, tournamentUsers: users, true)
-                            let controller = LobbyVC(currentUser: currentUser, tournySize: tournySize, tourny: newTourny)
-                            view.navigationController?.popToRootViewController(animated: true)
-                            view.navigationController?.pushViewController(controller, animated: true)
-                        }
-                        
+
+                reservation.runTransactionBlock { currentData -> TransactionResult in
+                    if currentData.value as? String == tournamentID {
+                        currentData.value = nil
                     }
-                    view.shouldPresentLoadingView(true, message: "Waiting for other users to join...")
+                    return TransactionResult.success(withValue: currentData)
+                } andCompletionBlock: { _, _, _ in
+                    self.reserveAndClaimPublicTournament(
+                        tournamentSize: tournamentSize,
+                        userID: userID,
+                        attemptsRemaining: attemptsRemaining - 1,
+                        completion: completion
+                    )
                 }
-                
             }
+        }
+    }
+
+    private func claimPublicTournament(
+        tournamentID: String,
+        tournamentSize: Int,
+        userID: String,
+        createIfMissing: Bool = false,
+        completion: @escaping (MatchmakingSession?) -> Void
+    ) {
+        REF_TOURNAMENTS.child(tournamentID).runTransactionBlock { currentData -> TransactionResult in
+            var tournament: [String: Any]
+            if let existingTournament = currentData.value as? [String: Any] {
+                tournament = existingTournament
+            } else if createIfMissing {
+                tournament = [
+                    "tournamentUsers": [],
+                    "acceptedUserIDs": [],
+                    "acceptedUsers": 0,
+                    "isPublic": true,
+                    "tournySize": tournamentSize
+                ]
+            } else {
+                return TransactionResult.abort()
+            }
+
+            guard Self.boolValue(tournament["isPublic"]),
+                  Self.intValue(tournament["tournySize"]) == tournamentSize,
+                  let users = Self.stringArray(tournament["tournamentUsers"]),
+                  let joinedUsers = MatchmakingRules.joining(userID: userID, users: users, capacity: tournamentSize) else {
+                return TransactionResult.abort()
+            }
+
+            tournament["tournamentUsers"] = joinedUsers
+            tournament["acceptedUserIDs"] = joinedUsers
+            tournament["acceptedUsers"] = joinedUsers.count
+            tournament["isPublic"] = joinedUsers.count < tournamentSize
+            currentData.value = tournament
+            return TransactionResult.success(withValue: currentData)
+        } andCompletionBlock: { error, committed, snapshot in
+            guard error == nil,
+                  committed,
+                  let tournament = snapshot?.value as? [String: Any],
+                  let users = Self.stringArray(tournament["tournamentUsers"]) else {
+                completion(nil)
+                return
+            }
+            completion(MatchmakingSession(tournamentID: tournamentID, userIDs: users))
         }
     }
     
@@ -246,5 +352,24 @@ struct Service {
         if let value = value as? [String] { return value }
         if let value = value as? [Any] { return value.compactMap { $0 as? String } }
         return nil
+    }
+
+    private static func matchmakingCandidates(from snapshot: DataSnapshot) -> [MatchmakingCandidate] {
+        guard let tournaments = snapshot.value as? [String: Any] else { return [] }
+
+        return tournaments.compactMap { tournamentID, value in
+            guard let tournament = value as? [String: Any],
+                  let tournamentSize = intValue(tournament["tournySize"]),
+                  let users = stringArray(tournament["tournamentUsers"]) else {
+                return nil
+            }
+
+            return MatchmakingCandidate(
+                tournamentID: tournamentID,
+                tournamentSize: tournamentSize,
+                isPublic: boolValue(tournament["isPublic"]),
+                userIDs: users
+            )
+        }
     }
 }
