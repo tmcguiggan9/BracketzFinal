@@ -6,7 +6,6 @@
 //
 
 import UIKit
-import Firebase
 
 class TournamentBuilderVC: UIViewController, UIPickerViewDelegate, UIPickerViewDataSource {
     
@@ -46,7 +45,7 @@ class TournamentBuilderVC: UIViewController, UIPickerViewDelegate, UIPickerViewD
         return picker
     }()
     
-    private let tournamentActionButton: UIButton = {
+    private lazy var tournamentActionButton: UIButton = {
         let button = UIButton(type: .system)
         button.layer.cornerRadius = 5
         button.titleLabel?.font = UIFont.boldSystemFont(ofSize: 20)
@@ -158,4 +157,3 @@ class TournamentBuilderVC: UIViewController, UIPickerViewDelegate, UIPickerViewD
     }
     
 }
-

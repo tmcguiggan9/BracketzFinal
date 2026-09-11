@@ -8,7 +8,6 @@
 
 import Foundation
 import UIKit
-import Firebase
 
 
 
@@ -52,7 +51,7 @@ class UserSelectionVC: UIViewController, UISearchControllerDelegate, UICollectio
     }()
     
     
-    private let sendInviteButton: UIButton = {
+    private lazy var sendInviteButton: UIButton = {
         let button = UIButton(type: .system)
         button.setTitle("Send Invites", for: .normal)
         button.layer.cornerRadius = 5
@@ -65,7 +64,7 @@ class UserSelectionVC: UIViewController, UISearchControllerDelegate, UICollectio
         return button
     }()
     
-    private let cancelButton: UIButton = {
+    private lazy var cancelButton: UIButton = {
         let button = UIButton(type: .system)
         button.setTitle("Cancel", for: .normal)
         button.layer.cornerRadius = 5

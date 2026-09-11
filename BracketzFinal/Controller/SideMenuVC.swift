@@ -15,7 +15,7 @@ class SideMenuVC: UIViewController {
     
     weak var delegate: SideMenuVCDelegate?
     
-    private var logoutButton: UIButton = {
+    private lazy var logoutButton: UIButton = {
         let button = UIButton(type: .system)
         button.setTitle("Log Out", for: .normal)
         button.layer.cornerRadius = 5
@@ -24,7 +24,7 @@ class SideMenuVC: UIViewController {
         button.setTitleColor(.white, for: .normal)
         button.setHeight(height: 50)
         button.isEnabled = true
-        button.addTarget(SideMenuVC.self, action: #selector(handleLogout), for: .touchUpInside)
+        button.addTarget(self, action: #selector(handleLogout), for: .touchUpInside)
         return button
     }()
     

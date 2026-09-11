@@ -6,14 +6,13 @@
 //
 
 import Foundation
-import Firebase
+import UIKit
+import FirebaseDatabase
 
 let DB_REF = Database.database().reference()
 let REF_USERS = DB_REF.child("users")
 let REF_TOURNAMENTS = DB_REF.child("tournaments")
 let REF_MATCHES = DB_REF.child("matches")
-
-private var refHandle: DatabaseHandle!
 
 struct Service {
     
@@ -33,12 +32,16 @@ struct Service {
     
     func fetchUsers(completion: @escaping([User]) -> Void) {
         REF_USERS.observeSingleEvent(of: .value) { (snapshot) in
-            guard let users = snapshot.value as? [String: Any] else { return }
-            var newUsers = [User]()
-            for x in users {
-                newUsers.append(User(uid: x.key, dictionary: x.value as! [String : Any]))
+            guard let users = snapshot.value as? [String: Any] else {
+                completion([])
+                return
             }
-        
+
+            let newUsers = users.compactMap { uid, value -> User? in
+                guard let dictionary = value as? [String: Any] else { return nil }
+                return User(uid: uid, dictionary: dictionary)
+            }
+
             completion(newUsers)
         }
     }
@@ -81,23 +84,24 @@ struct Service {
         REF_TOURNAMENTS.observeSingleEvent(of: .value) { (snapshot) in
             if let tournys = snapshot.value as? [String: Any] {
                 for x in tournys {
-                    var dictionary: [String: Any]
-                    dictionary = x.value as! [String: Any]
-                    if dictionary["isPublic"] as! Int == 1 && dictionary["tournySize"] as! Int == tournySize{
-                        print(x.key)
+                    guard let dictionary = x.value as? [String: Any],
+                          Self.boolValue(dictionary["isPublic"]),
+                          Self.intValue(dictionary["tournySize"]) == tournySize else {
+                        continue
+                    }
                         
                         REF_TOURNAMENTS.child(x.key).runTransactionBlock { (currentData: MutableData) -> TransactionResult in
-                            var tourny = currentData.value as? [String: Any]
-                            
-                            
-                            if tourny == nil {
-                                tourny = [:]
-                            } else {
-                                tourny!["acceptedUsers"] = tourny!["acceptedUsers"] as! Int + 1
-                                tournyUsers = (tourny!["tournamentUsers"] as? [String])!
-                                tournyUsers.append(currentUser.uid)
-                                tourny!["tournamentUsers"] = tournyUsers
-                                
+                            guard var tourny = currentData.value as? [String: Any],
+                                  let acceptedUsers = Self.intValue(tourny["acceptedUsers"]),
+                                  var users = tourny["tournamentUsers"] as? [String],
+                                  users.count < tournySize else {
+                                return TransactionResult.abort()
+                            }
+
+                            if !users.contains(currentUser.uid) {
+                                users.append(currentUser.uid)
+                                tourny["acceptedUsers"] = acceptedUsers + 1
+                                tourny["tournamentUsers"] = users
                                 currentData.value = tourny
                             }
                             
@@ -118,20 +122,23 @@ struct Service {
                             return TransactionResult.success(withValue: currentData)
                         }
                         return
-                    }
                 }
             }
             let values = ["tournamentUsers": [currentUser.uid], "acceptedUsers": 1, "isPublic": true, "tournySize": tournySize] as [String: Any]
             REF_TOURNAMENTS.childByAutoId().updateChildValues(values) { (error, ref) in
+                guard error == nil, let tournamentID = ref.key else {
+                    view.shouldPresentLoadingView(false)
+                    return
+                }
                 
-                REF_TOURNAMENTS.child(ref.key!).child("tournamentUsers").observe(.value) { (snapshot) in
+                REF_TOURNAMENTS.child(tournamentID).child("tournamentUsers").observe(.value) { (snapshot) in
                     guard let users = snapshot.value as? [String] else { return }
                     
                     if users.count == tournySize {
-                        REF_TOURNAMENTS.child(ref.key!).updateChildValues(["isPublic": false])
+                        REF_TOURNAMENTS.child(tournamentID).updateChildValues(["isPublic": false])
                         view.shouldPresentLoadingView(false)
                         DispatchQueue.main.async {
-                            let newTourny = Tournament(ref.key!, tournamentUsers: users, true)
+                            let newTourny = Tournament(tournamentID, tournamentUsers: users, true)
                             let controller = LobbyVC(currentUser: currentUser, tournySize: tournySize, tourny: newTourny)
                             view.navigationController?.popToRootViewController(animated: true)
                             view.navigationController?.pushViewController(controller, animated: true)
@@ -166,25 +173,41 @@ struct Service {
     
     
     func sendInvitesAndCreateTournament(tournyUsers: [String], tournySize: Int, view: UIViewController, currentUser: User) {
-        let values = ["tournamentUsers": tournyUsers, "acceptedUsers": 1, "isPublic": false] as [String: Any]
+        let values = ["tournamentUsers": tournyUsers, "acceptedUsers": 1, "isPublic": false, "tournySize": tournySize] as [String: Any]
         REF_TOURNAMENTS.childByAutoId().updateChildValues(values) { (error, ref) in
+            guard error == nil, let tournamentID = ref.key else {
+                view.shouldPresentLoadingView(false)
+                return
+            }
             view.dismiss(animated: true, completion: nil)
             
             for x in tournyUsers {
                 REF_USERS.child(x).child("unresolvedTournaments").observeSingleEvent(of: .value) { (snapshot) in
                     if var array = snapshot.value as? [String] {
-                        array.append(ref.key!)
+                        if !array.contains(tournamentID) {
+                            array.append(tournamentID)
+                        }
                         REF_USERS.child(x).updateChildValues(["unresolvedTournaments": array])
                     } else {
-                        REF_USERS.child(x).updateChildValues(["unresolvedTournaments": [ref.key]])
+                        REF_USERS.child(x).updateChildValues(["unresolvedTournaments": [tournamentID]])
                     }
                 }
             }
             
-                let newTourny = Tournament(ref.key!, tournamentUsers: tournyUsers, false)
+                let newTourny = Tournament(tournamentID, tournamentUsers: tournyUsers, false)
                 let controller = LobbyVC(currentUser: currentUser, tournySize: tournySize, tourny: newTourny)
             
                 view.navigationController?.pushViewController(controller, animated: true)
             }
+    }
+
+    private static func intValue(_ value: Any?) -> Int? {
+        if let value = value as? Int { return value }
+        return (value as? NSNumber)?.intValue
+    }
+
+    private static func boolValue(_ value: Any?) -> Bool {
+        if let value = value as? Bool { return value }
+        return (value as? NSNumber)?.boolValue ?? false
     }
 }

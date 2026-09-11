@@ -6,7 +6,6 @@
 //
 
 import UIKit
-import Firebase
 
 class MatchPlayVC: UIViewController {
     
@@ -17,19 +16,19 @@ class MatchPlayVC: UIViewController {
     var myMoveText: String = ""
     var loser = String()
     
-    let rockButton: MoveButton = {
+    lazy var rockButton: MoveButton = {
         let button = MoveButton(image: #imageLiteral(resourceName: "FIST"), move: "rock")
         button.addTarget(self, action: #selector(moveSelected(_:)), for: .touchUpInside)
         return button
     }()
     
-    let paperButton: MoveButton = {
+    lazy var paperButton: MoveButton = {
         let button = MoveButton(image: #imageLiteral(resourceName: "Paper2x"), move: "paper")
         button.addTarget(self, action: #selector(moveSelected(_:)), for: .touchUpInside)
         return button
     }()
     
-    let scissorsButton: MoveButton = {
+    lazy var scissorsButton: MoveButton = {
         let button = MoveButton(image: #imageLiteral(resourceName: "Scissors"), move: "scissors")
         button.addTarget(self, action: #selector(moveSelected(_:)), for: .touchUpInside)
         return button

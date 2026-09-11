@@ -7,7 +7,7 @@
 
 import Foundation
 import UIKit
-import Firebase
+import FirebaseAuth
 import MapKit
 
 

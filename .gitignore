@@ -1,0 +1,22 @@
+# macOS
+.DS_Store
+
+# Xcode user-specific state
+xcuserdata/
+*.xcuserstate
+*.xccheckout
+*.xcscmblueprint
+
+# Build output
+DerivedData/
+build/
+*.ipa
+*.dSYM.zip
+*.dSYM
+
+# Legacy dependency output (the project now uses Swift Package Manager)
+Pods/
+
+# Firebase local tooling
+firebase-debug.log
+.firebase/
