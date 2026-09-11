@@ -1,0 +1,76 @@
+{
+  "rules": {
+    ".read": false,
+    ".write": false,
+
+    "users": {
+      ".read": "auth != null",
+      "$uid": {
+        ".write": "auth != null && auth.uid === $uid",
+        "email": {
+          ".validate": "newData.isString() && newData.val().length > 3 && newData.val().length <= 254"
+        },
+        "fullname": {
+          ".validate": "newData.isString() && newData.val().length > 0 && newData.val().length <= 100"
+        },
+        "username": {
+          ".validate": "newData.isString() && newData.val().length > 0 && newData.val().length <= 40"
+        },
+        "unresolvedTournaments": {
+          ".write": "auth != null",
+          ".validate": "newData.hasChildren() || !newData.exists()",
+          "$index": {
+            ".validate": "newData.isString() && newData.val().length > 0 && newData.val().length <= 128"
+          }
+        },
+        "$other": {
+          ".validate": false
+        }
+      }
+    },
+
+    "tournaments": {
+      ".read": "auth != null",
+      "$tournamentId": {
+        ".write": "auth != null",
+        "tournamentUsers": {
+          ".validate": "newData.hasChildren()",
+          "$index": {
+            ".validate": "newData.isString() && newData.val().length > 0 && newData.val().length <= 128"
+          }
+        },
+        "acceptedUsers": {
+          ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 16"
+        },
+        "isPublic": {
+          ".validate": "newData.isBoolean()"
+        },
+        "tournySize": {
+          ".validate": "newData.isNumber() && (newData.val() === 2 || newData.val() === 4 || newData.val() === 8 || newData.val() === 16)"
+        },
+        "matches": {
+          "$matchId": {
+            "users": {
+              ".validate": "newData.hasChildren(['0', '1']) && newData.child('0').isString() && newData.child('1').isString()",
+              "$index": {
+                ".validate": "newData.isString() && newData.val().length > 0 && newData.val().length <= 128"
+              }
+            },
+            "user1move": {
+              ".validate": "newData.isString() && (newData.val() === 'rock' || newData.val() === 'paper' || newData.val() === 'scissors')"
+            },
+            "user2move": {
+              ".validate": "newData.isString() && (newData.val() === 'rock' || newData.val() === 'paper' || newData.val() === 'scissors')"
+            },
+            "$other": {
+              ".validate": false
+            }
+          }
+        },
+        "$other": {
+          ".validate": false
+        }
+      }
+    }
+  }
+}

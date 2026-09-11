@@ -6,7 +6,7 @@
 //
 
 import UIKit
-import Firebase
+import FirebaseAuth
 
 
 class RegistrationController: UIViewController {
@@ -50,7 +50,7 @@ class RegistrationController: UIViewController {
         return tf
     }()
     
-    private let signUpButton: UIButton = {
+    private lazy var signUpButton: UIButton = {
         let button = UIButton(type: .system)
         button.setTitle("Sign Up", for: .normal)
         button.layer.cornerRadius = 5
@@ -63,7 +63,7 @@ class RegistrationController: UIViewController {
         return button
     }()
     
-    private let alreadyHaveAccountButton: UIButton = {
+    private lazy var alreadyHaveAccountButton: UIButton = {
         let button = UIButton(type: .system)
         let attributedTitle = NSMutableAttributedString(string: "Already have an account?  ", attributes: [.font: UIFont.systemFont(ofSize: 16), .foregroundColor: UIColor.white])
         
@@ -85,14 +85,22 @@ class RegistrationController: UIViewController {
     
     
     @objc func handleRegistration() {
-        guard let email = emailTextField.text else {return}
-        guard let password = passwordTextField.text else { return }
-        guard let fullname = fullNameTextField.text else { return }
-        guard let username = userNameTextField.text else { return }
+        let email = emailTextField.text?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+        let password = passwordTextField.text ?? ""
+        let fullname = fullNameTextField.text?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+        let username = userNameTextField.text?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+
+        guard !email.isEmpty, !password.isEmpty, !fullname.isEmpty, !username.isEmpty else {
+            presentError("Complete every field before creating your account.")
+            return
+        }
+
+        signUpButton.isEnabled = false
         
         Auth.auth().createUser(withEmail: email, password: password) { (result, error) in
             if let error = error {
-                print("Failed to register user with error \(error.localizedDescription)")
+                self.signUpButton.isEnabled = true
+                self.presentError(error.localizedDescription)
                 return
             }
             
@@ -108,6 +116,11 @@ class RegistrationController: UIViewController {
     
     func uploadUserDataAndShowHomeController(uid: String, values: [String: Any]) {
         REF_USERS.child(uid).updateChildValues(values) { (error, ref) in
+            self.signUpButton.isEnabled = true
+            if let error = error {
+                self.presentError("Your account was created, but the profile could not be saved: \(error.localizedDescription)")
+                return
+            }
             self.dismiss(animated: true, completion: nil)
         }
     }
@@ -137,5 +150,3 @@ class RegistrationController: UIViewController {
     }
 
 }
-
-

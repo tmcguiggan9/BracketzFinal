@@ -16,6 +16,8 @@
 	<string>com.tmcguiggan.BracketzFinal</string>
 	<key>PROJECT_ID</key>
 	<string>bracketzfinal</string>
+	<key>DATABASE_URL</key>
+	<string>https://bracketzfinal-default-rtdb.firebaseio.com</string>
 	<key>STORAGE_BUCKET</key>
 	<string>bracketzfinal.appspot.com</string>
 	<key>IS_ADS_ENABLED</key>

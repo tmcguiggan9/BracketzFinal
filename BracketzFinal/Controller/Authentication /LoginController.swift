@@ -6,9 +6,15 @@
 //
 
 import UIKit
-import Firebase
+import FirebaseAuth
+
+protocol LoginControllerDelegate: AnyObject {
+    func setCurrentUser()
+}
 
 class LoginController: UIViewController {
+    
+    weak var delegate: LoginControllerDelegate?
     
     private let iconImage: UIImageView = {
         let iv = UIImageView()
@@ -34,7 +40,7 @@ class LoginController: UIViewController {
         return tf
     }()
     
-    private let loginButton: UIButton = {
+    private lazy var loginButton: UIButton = {
         let button = UIButton(type: .system)
         button.setTitle("Log In", for: .normal)
         button.layer.cornerRadius = 5
@@ -47,7 +53,7 @@ class LoginController: UIViewController {
         return button
     }()
     
-    private let dontHaveAccountButton: UIButton = {
+    private lazy var dontHaveAccountButton: UIButton = {
         let button = UIButton(type: .system)
         let attributedTitle = NSMutableAttributedString(string: "Don't have an account?  ", attributes: [.font: UIFont.systemFont(ofSize: 16), .foregroundColor: UIColor.white])
         
@@ -71,15 +77,25 @@ class LoginController: UIViewController {
     }
     
     @objc func handleLogin() {
-        guard let email = emailTextField.text else {return}
-        guard let password = passwordTextField.text else {return}
+        let email = emailTextField.text?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+        let password = passwordTextField.text ?? ""
+
+        guard !email.isEmpty, !password.isEmpty else {
+            presentError("Enter both your email address and password.")
+            return
+        }
+
+        loginButton.isEnabled = false
         
         Auth.auth().signIn(withEmail: email, password: password) { (result, error) in
+            self.loginButton.isEnabled = true
             if let error = error {
-                print("failed to log user in with error \(error.localizedDescription)")
+                self.presentError(error.localizedDescription)
                 return
             }
-            self.dismiss(animated: true, completion: nil)
+            self.dismiss(animated: true) {
+                self.delegate?.setCurrentUser()
+            }
         }
     }
     
@@ -124,5 +140,3 @@ class LoginController: UIViewController {
     */
 
 }
-
-

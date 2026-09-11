@@ -8,6 +8,10 @@
 import Foundation
 
 
+public enum TournamentType {
+    case create
+    case join
+}
 
 struct Tournament {
     let tournamentID: String

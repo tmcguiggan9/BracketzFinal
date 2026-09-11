@@ -6,9 +6,17 @@
 //
 
 import UIKit
-import Firebase
+import FirebaseAuth
 
-class TabBarController: UITabBarController, UITabBarControllerDelegate, SideMenuVCDelegate {
+
+
+class TabBarController: UITabBarController, UITabBarControllerDelegate, SideMenuVCDelegate, LoginControllerDelegate {
+    
+    let view1 = TournamentBuilderVC(tournamentType: .create)
+    let view2 = TournamentBuilderVC(tournamentType: .join)
+    var currentUser: User?
+    
+    
     func handleLogout() {
         do {
             try Auth.auth().signOut()
@@ -29,7 +37,7 @@ class TabBarController: UITabBarController, UITabBarControllerDelegate, SideMenu
         configureNavigationBar(withTitle: "BRACKETZ", prefersLargeTitles: false)
 
         let image = UIImage(systemName: "envelope.badge")
-        navigationItem.rightBarButtonItem = UIBarButtonItem(image: image, style: .plain, target: self, action: #selector(presentInviteController))
+        navigationItem.rightBarButtonItem = UIBarButtonItem(image: image, style: .plain, target: self, action: #selector(presentInvitesVC))
         let image2 = UIImage(systemName: "line.horizontal.3")
         navigationItem.leftBarButtonItem = UIBarButtonItem(image: image2, style: .plain, target: self, action: #selector(presentMenu))
         
@@ -38,26 +46,48 @@ class TabBarController: UITabBarController, UITabBarControllerDelegate, SideMenu
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         checkLoggedIn()
-        let view1 = CreateTournyVC()
-        let view2 = JoinTournyVC()
+//        let view1 = TournamentBuilderVC(tournamentType: .create)
+//        let view2 = TournamentBuilderVC(tournamentType: .join)
         let icon1 = UITabBarItem(title: "Create", image: UIImage(systemName: "plus"), selectedImage: UIImage(systemName: "plus"))
         let icon2 = UITabBarItem(title: "Join", image: UIImage(systemName: "person.3.fill"), selectedImage: UIImage(systemName: "person.3.fill"))
         view1.tabBarItem = icon1
         view2.tabBarItem = icon2
         let controllers = [view1, view2]
         self.viewControllers = controllers
+    }
     
+    @objc func presentInvitesVC() {
+        if let currentUser = currentUser {
+            let controller = InvitesVC(currentUser: currentUser)
+            navigationController?.pushViewController(controller, animated: true)
+        }
+    }
+    
+    @objc func setCurrentUser() {
+        let user = Auth.auth().currentUser
+        
+        if let user = user {
+            Service.shared.fetchUserData(uid: user.uid) { (currentUserData) in
+                self.currentUser = currentUserData
+                print("Debug: Current User is \(currentUserData)")
+            }
+        } else {
+            print("DEBUG: Could not collect user data")
+        }
     }
     
     func checkLoggedIn() {
         if Auth.auth().currentUser == nil {
             presentLoginScreen()
+        } else {
+            setCurrentUser()
         }
     }
     
     func presentLoginScreen() {
         DispatchQueue.main.async {
             let controller = LoginController()
+            controller.delegate = self
             let nav = UINavigationController(rootViewController: controller)
             nav.modalPresentationStyle = .fullScreen
             self.present(nav, animated: true, completion: nil)
@@ -72,10 +102,10 @@ class TabBarController: UITabBarController, UITabBarControllerDelegate, SideMenu
         present(nav, animated: true, completion: nil)
     }
     
-    @objc func presentInviteController() {
-        let controller = InvitesVC()
-        navigationController?.pushViewController(controller, animated: true)
-    }
+//    func presentInvitesController(currentUserData: User) {
+//        let controller = InvitesVC(currentUser: currentUserData)
+//        navigationController?.pushViewController(controller, animated: true)
+//    }
     
     func tabBarController(_ tabBarController: UITabBarController, shouldSelect viewController: UIViewController) -> Bool {
         return true

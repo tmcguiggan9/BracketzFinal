@@ -17,7 +17,7 @@ class LoserVC: UIViewController {
         return label
     }()
     
-    private let returnButton: UIButton = {
+    private lazy var returnButton: UIButton = {
         let button = UIButton(type: .system)
         button.setTitle("Return Home", for: .normal)
         button.layer.cornerRadius = 5

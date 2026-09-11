@@ -119,6 +119,12 @@ extension UIView {
 
 
 extension UIViewController {
+
+    func presentError(_ message: String) {
+        let alert = UIAlertController(title: "Something Went Wrong", message: message, preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: "OK", style: .default))
+        present(alert, animated: true)
+    }
     
     func shouldPresentLoadingView(_ present: Bool, message: String? = nil) {
         if present {

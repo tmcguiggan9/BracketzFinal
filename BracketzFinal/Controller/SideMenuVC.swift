@@ -15,7 +15,7 @@ class SideMenuVC: UIViewController {
     
     weak var delegate: SideMenuVCDelegate?
     
-    private var logoutButton: UIButton = {
+    private lazy var logoutButton: UIButton = {
         let button = UIButton(type: .system)
         button.setTitle("Log Out", for: .normal)
         button.layer.cornerRadius = 5
